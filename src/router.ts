@@ -13,17 +13,17 @@ Vue.use(VueRouter);
 const domainName = window.location.hostname;
 
 const routes: Array<RouteConfig> = [
-  { path: '/:key/settings/:from?', name: 'settings', component: Settings },
+  { path: '/symblox/settings/:from?', name: 'settings', component: Settings },
   { path: '/networks', name: 'networks', component: Networks },
   { path: '/strategies', name: 'strategies', component: Strategies },
-  { path: '/:key/proposal/:id', name: 'proposal', component: Proposal },
-  { path: '/:key/create', name: 'create', component: Create },
-  { path: '/:key', name: 'proposals', component: Proposals },
-  { path: '/:key/:tab', name: 'proposals-tab', component: Proposals },
+  { path: '/symblox/proposal/:id', name: 'proposal', component: Proposal },
+  { path: '/symblox/create', name: 'create', component: Create },
+  { path: '/symblox', name: 'proposals', component: Proposals },
+  { path: '/symblox/:tab', name: 'proposals-tab', component: Proposals },
+  { path: '/home', name: 'home', component: domains[domainName] ? Proposals : Home },
   {
     path: '/',
-    name: 'home',
-    component: domains[domainName] ? Proposals : Home
+    redirect: '/symblox', // Set default route
   },
   { path: '/*', name: 'error-404', beforeEnter: (to, from, next) => next('/') }
 ];

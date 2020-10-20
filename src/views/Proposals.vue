@@ -65,6 +65,7 @@ import { mapActions } from 'vuex';
 export default {
   data() {
     return {
+      key: 'yearn', // Default project ID
       loading: false,
       loaded: false,
       proposals: {},
@@ -72,9 +73,9 @@ export default {
     };
   },
   computed: {
-    key() {
-      return this.domain || this.$route.params.key;
-    },
+    // key() {
+    //   return this.domain || this.$route.params.key;
+    // },
     space() {
       return this.app.spaces[this.key];
     },
