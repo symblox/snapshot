@@ -81,15 +81,20 @@ export default {
     states() {
       const states = [
         'all',
-        'core',
-        'community',
-        'active',
         'pending',
-        'closed'
+        'active',
+        'canceled',
+        'defeated',
+        'succeeded',
+        'queued',
+        'expired',
+        'executed'
       ];
-      return this.space.filters.onlyMembers
-        ? states.filter(state => !['core', 'community'].includes(state))
-        : states;
+
+      return states;
+      // return this.space.filters.onlyMembers
+      //   ? states.filter(state => !['core', 'community'].includes(state))
+      //   : states;
     },
     totalProposals() {
       return Object.keys(this.proposals).length;
@@ -97,39 +102,16 @@ export default {
     proposalsWithFilter() {
       const ts = (Date.now() / 1e3).toFixed();
       if (this.totalProposals === 0) return {};
+      
       return Object.fromEntries(
         Object.entries(this.proposals)
           .filter(proposal => {
-            const core = this.space.members.map(address =>
-              address.toLowerCase()
-            );
-            const author = proposal[1].address.toLowerCase();
             if (
-              (this.space.filters.onlyMembers && !core.includes(author)) ||
-              this.space.filters.invalids.includes(proposal[1].authorIpfsHash)
+              ['all'].includes(this.selectedState)
             )
-              return false;
+              return true;   
 
-            if (
-              ['core', 'all'].includes(this.selectedState) &&
-              core.includes(author) &&
-              !this.space.filters.invalids.includes(proposal[1].authorIpfsHash)
-            )
-              return true;
-
-            if (proposal[1].score < this.space.filters.minScore) return false;
-
-            if (
-              this.selectedState === 'all' ||
-              (this.selectedState === 'active' &&
-                proposal[1].msg.payload.start <= ts &&
-                proposal[1].msg.payload.end > ts) ||
-              (this.selectedState === 'community' && !core.includes(author)) ||
-              (this.selectedState === 'closed' &&
-                proposal[1].msg.payload.end <= ts) ||
-              (this.selectedState === 'pending' &&
-                proposal[1].msg.payload.start > ts)
-            )
+            if(this.selectedState.toLocaleLowerCase() === proposal[1].msg.payload.state.toLocaleLowerCase())
               return true;
           })
           .sort((a, b) => b[1].msg.payload.end - a[1].msg.payload.end, 0)

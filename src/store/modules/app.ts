@@ -5,14 +5,27 @@ import client from '@/helpers/client';
 import ipfs from '@/helpers/ipfs';
 import getProvider from '@/helpers/provider';
 import { formatProposal, formatProposals, formatSpace } from '@/helpers/utils';
-import { getBlockNumber, signMessage } from '@/helpers/web3';
+import { getBlockNumber, getBlockTimestamp, signMessage, getContract} from '@/helpers/web3';
 import { version } from '@/../package.json';
+
+const secondsPerBlock = 5;
 
 const state = {
   init: false,
   loading: false,
   spaces: {}
 };
+
+const proposalState = {
+  "0": "Pending",
+  "1": "Active",
+  "2": "Canceled",
+  "3": "Defeated",
+  "4": "Succeeded",
+  "5": "Queued",
+  "6": "Expired",
+  "7": "Executed"
+}
 
 const mutations = {
   SET(_state, payload) {
@@ -70,7 +83,20 @@ const actions = {
     commit('SET', { loading: payload });
   },
   getSpaces: async ({ commit }) => {
-    let spaces: any = await client.request('spaces');
+    //let spaces: any = await client.request('spaces');
+    let spaces: any = {};
+    spaces["symblox"] = {
+      domain: "https://app.symblox.io/",
+      members: [],
+      name: "symblox",
+      network: "111",
+      skin: "yearn",
+      symbol: "SYX",
+      token: "0xC20932B245840CA1C6F8c9c90BDb2F4E0289DE48",
+      governor: "0xFFcE69Af5A5e9f4B53F0A37A3c6bb2923B89996c",
+      strategies: []
+    }
+   
     spaces = Object.fromEntries(
       Object.entries(spaces).map(space => [
         space[0],
@@ -112,24 +138,57 @@ const actions = {
   getProposals: async ({ commit }, space) => {
     commit('GET_PROPOSALS_REQUEST');
     try {
-      let proposals: any = await client.request(`${space.key}/proposals`);
-      if (proposals) {
-        const scores: any = await getScores(
-          space.strategies,
-          space.network,
-          getProvider(space.network),
-          Object.values(proposals).map((proposal: any) => proposal.address)
-        );
-        proposals = Object.fromEntries(
-          Object.entries(proposals).map((proposal: any) => {
-            proposal[1].score = scores.reduce(
-              (a, b) => a + b[proposal[1].address],
-              0
+      const provider = getProvider(space.network);
+      const contract = await getContract(space.governor,"Governor",provider);
+
+      const curBlockNumber = await getBlockNumber(provider);
+      const curTimestamp = await getBlockTimestamp(
+        provider, curBlockNumber
+      );
+
+      const proposalCreatedFilter = contract.filters.ProposalCreated();
+      proposalCreatedFilter['fromBlock'] = 0;
+
+      const proposalCreatedLogs = await provider.getLogs(proposalCreatedFilter);
+
+      const proposals: any = await Promise.all(
+        proposalCreatedLogs.map(async (log) => { 
+          const logData = contract.interface.parseLog(log);
+          const {description, proposer, id, startBlock, endBlock} = logData.args;
+          let startTimestamp, endTimestamp;
+          if(curBlockNumber > startBlock){
+            startTimestamp = await getBlockTimestamp(
+              provider, parseFloat(startBlock)
             );
-            return [proposal[0], proposal[1]];
-          })
-        );
-      }
+          }else{
+            startTimestamp = curTimestamp+(startBlock-curBlockNumber)*secondsPerBlock;
+          }
+
+          if(curBlockNumber > endBlock){
+            endTimestamp = await getBlockTimestamp(
+              provider, parseFloat(endBlock)
+            );
+          }else{
+            endTimestamp = curTimestamp+(endBlock-curBlockNumber)*secondsPerBlock;
+          }
+
+          const stateId = await contract.state(id);
+
+          return {
+              "id": id.toString(),
+              "address": proposer,
+              "msg": {
+                "payload": {
+                  "name": description,
+                  "start": startTimestamp,
+                  "end": endTimestamp,
+                  "state": proposalState[stateId]
+                }
+              }
+          }
+        })
+      );
+
       commit('GET_PROPOSALS_SUCCESS');
       return formatProposals(proposals);
     } catch (e) {
@@ -139,63 +198,84 @@ const actions = {
   getProposal: async ({ commit }, payload) => {
     commit('GET_PROPOSAL_REQUEST');
     try {
+      const provider = getProvider(payload.space.network);
+      const contract = await getContract(payload.space.governor,"Governor",provider);
+
       const blockNumber = await getBlockNumber(
-        getProvider(payload.space.network)
+        provider
       );
+      const curTimestamp = await getBlockTimestamp(
+        provider, blockNumber
+      );
+      const proposal = await contract.proposals(payload.id);
+      const stateId = await contract.state(payload.id);
+      
+      let startTimestamp, endTimestamp;
+      if(blockNumber > proposal.startBlock){
+        startTimestamp = await getBlockTimestamp(
+          provider, parseFloat(proposal.startBlock)
+        );
+      }else{
+        startTimestamp = curTimestamp+(proposal.startBlock-blockNumber)*secondsPerBlock;
+      }
+
+      if(blockNumber > proposal.endBlock){
+        endTimestamp = await getBlockTimestamp(
+          provider, parseFloat(proposal.endBlock)
+        );
+      }else{
+        endTimestamp = curTimestamp+(proposal.endBlock-blockNumber)*secondsPerBlock;
+      }
+
       const result: any = {};
-      const [proposal, votes] = await Promise.all([
-        ipfs.get(payload.id),
-        client.request(`${payload.space.key}/proposal/${payload.id}`)
-      ]);
-      result.proposal = formatProposal(proposal);
-      result.proposal.ipfsHash = payload.id;
-      result.votes = votes;
-      const { snapshot } = result.proposal.msg.payload;
-      const blockTag = snapshot > blockNumber ? 'latest' : parseInt(snapshot);
-      const scores: any = await getScores(
-        payload.space.strategies,
-        payload.space.network,
-        getProvider(payload.space.network),
-        Object.keys(result.votes),
-        // @ts-ignore
-        blockTag
+
+      result.proposal = {
+        "address": proposal.proposer,
+        "id": proposal.id,
+        "msg": {
+          "token": payload.space.governor,
+          "type": "proposal",
+          "payload": {
+            "name": payload.name,
+            "choices": ["Yes", "No"],
+            "start": startTimestamp,
+            "end": endTimestamp,
+            "state": proposalState[stateId]
+          }
+        }
+      };
+
+      const voteCastFilter = contract.filters.VoteCast();
+      voteCastFilter['fromBlock'] = 0;
+      const voteCastLogs = await provider.getLogs(voteCastFilter);
+      result.votes = await Promise.all(
+        voteCastLogs.map(async (log) => { 
+          const logData = contract.interface.parseLog(log);
+          const {voter, proposalId, support, votes} = logData.args;
+          if(proposalId.toString()===payload.id){
+            return {
+              [voter]: {
+                "address": voter,
+                "msg": {
+                  "type": "vote",
+                  "payload": {
+                    "choice": support?1:2
+                  }
+                },
+                "scores": [votes/10**18],
+                "balance": votes/10**18
+              }
+            }
+          }
+        })
       );
-      console.log('Scores', scores);
-      result.votes = Object.fromEntries(
-        Object.entries(result.votes)
-          .map((vote: any) => {
-            vote[1].scores = payload.space.strategies.map(
-              (strategy, i) => scores[i][vote[1].address] || 0
-            );
-            vote[1].balance = vote[1].scores.reduce((a, b: any) => a + b, 0);
-            return vote;
-          })
-          .sort((a, b) => b[1].balance - a[1].balance)
-          .filter(vote => vote[1].balance > 0)
-      );
+
+    const forVotes = proposal.forVotes/10**18, againstVotes = proposal.againstVotes;
       result.results = {
-        totalVotes: result.proposal.msg.payload.choices.map(
-          (choice, i) =>
-            Object.values(result.votes).filter(
-              (vote: any) => vote.msg.payload.choice === i + 1
-            ).length
-        ),
-        totalBalances: result.proposal.msg.payload.choices.map((choice, i) =>
-          Object.values(result.votes)
-            .filter((vote: any) => vote.msg.payload.choice === i + 1)
-            .reduce((a, b: any) => a + b.balance, 0)
-        ),
-        totalScores: result.proposal.msg.payload.choices.map((choice, i) =>
-          payload.space.strategies.map((strategy, sI) =>
-            Object.values(result.votes)
-              .filter((vote: any) => vote.msg.payload.choice === i + 1)
-              .reduce((a, b: any) => a + b.scores[sI], 0)
-          )
-        ),
-        totalVotesBalances: Object.values(result.votes).reduce(
-          (a, b: any) => a + b.balance,
-          0
-        )
+        // totalVotes: [proposal.forVotes, proposal.againstVotes],
+        totalBalances: [forVotes, againstVotes],
+        totalScores: [forVotes, againstVotes],
+        totalVotesBalances: parseFloat(forVotes.toString())+parseFloat(againstVotes.toString())
       };
       commit('GET_PROPOSAL_SUCCESS');
       return result;

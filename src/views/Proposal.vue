@@ -72,7 +72,7 @@
       </div>
       <div v-if="loaded" class="col-12 col-lg-4 float-left">
         <Block title="Information">
-          <div class="mb-1 overflow-hidden">
+          <!-- <div class="mb-1 overflow-hidden">
             <b>Token(s)</b>
             <a
               @click="modalStrategiesOpen = true"
@@ -88,7 +88,7 @@
                 />
               </span>
             </a>
-          </div>
+          </div> -->
           <div class="mb-1">
             <b>Author</b>
             <User
@@ -98,13 +98,11 @@
             />
           </div>
           <div class="mb-1">
-            <b>IPFS</b>
+            <b>ID</b>
             <a
-              :href="_ipfsUrl(proposal.ipfsHash)"
-              target="_blank"
               class="float-right"
             >
-              #{{ proposal.ipfsHash.slice(0, 7) }}
+              #{{ proposal.id }}
               <Icon name="external-link" class="ml-1" />
             </a>
           </div>
@@ -125,7 +123,7 @@
                 class="float-right text-white tooltipped tooltipped-n"
               />
             </div>
-            <div class="mb-1">
+            <!-- <div class="mb-1">
               <b>Snapshot</b>
               <a
                 :href="_explorer(space.network, payload.snapshot, 'block')"
@@ -135,7 +133,7 @@
                 {{ $n(payload.snapshot) }}
                 <Icon name="external-link" class="ml-1" />
               </a>
-            </div>
+            </div> -->
           </div>
         </Block>
         <BlockResults

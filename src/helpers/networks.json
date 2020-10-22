@@ -60,6 +60,13 @@
     "wsUrl": "wss://rpc.xdaichain.com/wss",
     "explorer": "https://blockscout.com/poa/xdai"
   },
+  "111": {
+    "name": "VLX testnet",
+    "chainId": 111,
+    "network": "testnet",
+    "rpcUrl": "https://tn.yopta.net",
+    "explorer": "https://xtn.yopta.net"
+  },
   "137": {
     "name": "Matic Mainnet",
     "chainId": 137,

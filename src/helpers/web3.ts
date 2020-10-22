@@ -22,6 +22,15 @@ export async function getBlockNumber(provider) {
   }
 }
 
+export async function getBlockTimestamp(provider, blockNumber) {
+  try {
+    const block: any = await provider.getBlock(blockNumber);
+    return block.timestamp;
+  } catch (e) {
+    return Promise.reject();
+  }
+}
+
 export async function sendTransaction(
   web3,
   [contractType, contractAddress, action, params]
@@ -38,4 +47,12 @@ export async function sendTransaction(
   const tx = await contractWithSigner[action](...params, overrides);
   await tx.wait();
   return tx;
+}
+
+export async function getContract(contractAddress, contractType, web3) {
+  return new Contract(
+    getAddress(contractAddress),
+    abi[contractType],
+    web3
+  );
 }

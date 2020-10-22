@@ -9,11 +9,13 @@ export default {
   },
   computed: {
     state() {
-      const ts = (Date.now() / 1e3).toFixed();
-      const { start, end } = this.proposal.msg.payload;
-      if (ts > end) return { name: 'Closed', class: 'bg-purple' };
-      if (ts > start) return { name: 'Active', class: 'bg-green' };
-      return { name: 'Pending' };
+      const { state } = this.proposal.msg.payload;
+      let className;
+      if(state === "Closed"){
+        className = 'bg-purple';
+      }
+
+      return { name: state, class: className};
     }
   }
 };
