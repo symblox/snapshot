@@ -6,12 +6,12 @@
     :slim="true"
   >
     <div
-      v-for="(vote, address, i) in visibleVotes"
+      v-for="(vote, i) in visibleVotes"
       :key="i"
       :style="i === 0 && 'border: 0 !important;'"
       class="px-4 py-3 border-top d-flex"
     >
-      <User :address="address" :space="space" class="column" />
+      <User :address="vote.address" :space="space" class="column" />
       <div
         v-text="proposal.msg.payload.choices[vote.msg.payload.choice - 1]"
         class="flex-auto text-center text-white"
