@@ -5,7 +5,7 @@ import client from '@/helpers/client';
 import ipfs from '@/helpers/ipfs';
 import getProvider from '@/helpers/provider';
 import { formatProposal, formatProposals, formatSpace } from '@/helpers/utils';
-import { getBlockNumber, getBlockTimestamp, signMessage, getContract} from '@/helpers/web3';
+import { getBlockNumber, getBlockTimestamp, signMessage, getContract, sendTransaction} from '@/helpers/web3';
 import { version } from '@/../package.json';
 
 const secondsPerBlock = 5;
@@ -108,23 +108,18 @@ const actions = {
   },
   send: async ({ commit, dispatch, rootState }, { token, type, payload }) => {
     const auth = getInstance();
+  
     commit('SEND_REQUEST');
     try {
-      const msg: any = {
-        address: rootState.web3.account,
-        msg: JSON.stringify({
-          version,
-          timestamp: (Date.now() / 1e3).toFixed(),
-          token,
-          type,
-          payload
-        })
-      };
-      msg.sig = await signMessage(auth.web3, msg.msg, rootState.web3.account);
-      const result = await client.request('message', msg);
+      console.log(payload.contractType, payload.contractAddress,payload.action,payload.targets,payload.values,payload.signatures,payload.calldatas,payload.name)
+      const result: any = await sendTransaction(auth.web3, [payload.contractType, payload.contractAddress,payload.action,[payload.targets,payload.values,payload.signatures,payload.calldatas,payload.name]]);
+
+      console.log("tx: ", result);
+
       commit('SEND_SUCCESS');
       dispatch('notify', ['green', `Your ${type} is in!`]);
-      return result;
+      
+      return true;
     } catch (e) {
       commit('SEND_FAILURE', e);
       const errorMessage =
@@ -132,7 +127,21 @@ const actions = {
           ? `Oops, ${e.error_description}`
           : 'Oops, something went wrong!';
       dispatch('notify', ['red', errorMessage]);
-      return;
+      return false;
+    }
+  },
+  getLatestProposalIds: async ({ commit }, space) => {
+    commit('GET_USER_LAST_PROPOSAL');
+    try {
+      const auth = getInstance();
+      const accounts = await auth.web3.listAccounts();
+      const provider = getProvider(space.network);
+      const contract = await getContract(space.governor,"Governor",provider);
+      const proposalId = await contract.latestProposalIds(accounts[0]);
+      commit('GET_USER_LAST_PROPOSAL_SUCCESS');
+      return proposalId.toString();
+    } catch(e){
+      commit('GET_USER_LAST_PROPOSAL_FAILURE', e);
     }
   },
   getProposals: async ({ commit }, space) => {
@@ -190,7 +199,7 @@ const actions = {
       );
 
       commit('GET_PROPOSALS_SUCCESS');
-      return formatProposals(proposals);
+      return proposals;
     } catch (e) {
       commit('GET_PROPOSALS_FAILURE', e);
     }
@@ -254,7 +263,6 @@ const actions = {
           const {voter, proposalId, support, votes} = logData.args;
           if(proposalId.toString()===payload.id){
             return {
-              [voter]: {
                 "address": voter,
                 "msg": {
                   "type": "vote",
@@ -265,7 +273,6 @@ const actions = {
                 "scores": [votes/10**18],
                 "balance": votes/10**18
               }
-            }
           }
         })
       );

@@ -102,12 +102,11 @@ export default {
     proposalsWithFilter() {
       const ts = (Date.now() / 1e3).toFixed();
       if (this.totalProposals === 0) return {};
-      
       return Object.fromEntries(
         Object.entries(this.proposals)
           .filter(proposal => {
             if (
-              ['all'].includes(this.selectedState)
+              ['all',undefined].includes(this.selectedState)
             )
               return true;   
 
