@@ -15,7 +15,7 @@
           <div class="d-flex flex-column mb-6">
             <input
               v-autofocus
-              v-model="form.name"
+              v-model="name"
               maxlength="128"
               class="h1 mb-2 input"
               placeholder="Question"
@@ -211,6 +211,7 @@ export default {
   },
   data() {
     return {
+      name: "",
       key: this.$route.params.key,
       loading: false,
       targets: [],
@@ -222,12 +223,8 @@ export default {
         contractType: 'Governor',
         contractAddress: '',
         action: 'propose',
-        name: '',
         // body: '',
-        targets: [],
-        values: [],
-        signatures: [],
-        calldatas: [],
+        args: [],
         // start: '',
         // end: '',
         // snapshot: '',
@@ -248,7 +245,7 @@ export default {
       return (
         !this.loading &&
         this.web3.account && 
-        this.form.name && 
+        this.name && 
         this.targets.length > 0 && 
         this.targets.length === this.values.length &&
         this.targets.length === this.signatures.length &&
@@ -309,14 +306,14 @@ export default {
     // },
     async handleSubmit() {
       this.loading = true;
-      this.form.targets = this.targets.map(target => target.text);
-      this.form.values = this.values.map(value => value.text);
-      this.form.signatures = this.signatures.map(signature => signature.text);
-      this.form.calldatas = this.calldatas.map(calldata => calldata.text);
+      const targets = this.targets.map(target => target.text);
+      const values = this.values.map(value => value.text);
+      const signatures = this.signatures.map(signature => signature.text);
+      const calldatas = this.calldatas.map(calldata => calldata.text);
       this.form.contractAddress = this.space.governor;
+      this.form.args = [targets,values,signatures,calldatas,this.name];
       try {
         const result = await this.send({
-          token: this.space.token,
           type: 'proposal',
           payload: this.form
         });

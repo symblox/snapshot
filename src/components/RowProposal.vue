@@ -1,7 +1,7 @@
 <template>
   <router-link
     class="px-4 py-3 border-top d-block text-gray"
-    :to="{ name: 'proposal', params: { key: token, id: proposal.id } }"
+    :to="{ name: 'proposal', params: { key: token, id: proposal.id, name: proposal.msg.payload.name } }"
   >
     <div>
       <State :proposal="proposal" class="d-inline-block mr-2 mb-2" />

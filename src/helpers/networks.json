@@ -60,6 +60,13 @@
     "wsUrl": "wss://rpc.xdaichain.com/wss",
     "explorer": "https://blockscout.com/poa/xdai"
   },
+  "106": {
+    "name": "VLX",
+    "chainId": 106,
+    "network": "Mainnet",
+    "rpcUrl": "https://explorer.velas.com/rpc",
+    "explorer": "https://explorer.velas.com"
+  },
   "111": {
     "name": "VLX testnet",
     "chainId": 111,

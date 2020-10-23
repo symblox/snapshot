@@ -12,7 +12,7 @@
           <span v-text="'Option'" class="flex-auto text-gray mr-1" />
           {{ proposal.msg.payload.choices[selectedChoice - 1] }}
         </div>
-        <div class="d-flex">
+        <!-- <div class="d-flex">
           <span v-text="'Snapshot'" class="flex-auto text-gray mr-1" />
           <a
             :href="
@@ -24,14 +24,20 @@
             {{ $n(proposal.msg.payload.snapshot) }}
             <Icon name="external-link" class="ml-1" />
           </a>
-        </div>
+        </div> -->
         <div class="d-flex">
           <span v-text="'Your voting power'" class="flex-auto text-gray mr-1" />
-          <span v-for="(symbol, i) of symbols" :key="symbol">
+           <span>
+            {{ _numeral(scores[0]) }}
+            SYX
+           
+          </span>
+          <!-- <span v-for="(symbol, i) of symbols" :key="symbol">
             {{ _numeral(scores[i]) }}
+          
             {{ symbol }}
             <span v-show="i !== symbols.length - 1" v-text="'+'" class="mr-1" />
-          </span>
+          </span> -->
         </div>
       </div>
       <div class="p-4 overflow-hidden text-center border-top">
@@ -65,7 +71,7 @@ export default {
     'proposal',
     'id',
     'selectedChoice',
-    'snapshot',
+    // 'snapshot',
     'totalScore',
     'scores'
   ],
@@ -84,12 +90,12 @@ export default {
     async handleSubmit() {
       this.loading = true;
       await this.send({
-        token: this.space.token,
-        type: 'vote',
+        type: 'proposal',
         payload: {
-          proposal: this.id,
-          choice: this.selectedChoice,
-          metadata: {}
+          contractType: "Governor",
+          contractAddress: this.space.governor,
+          action: "castVote",
+          args: [this.id, this.selectedChoice === 1?true:false]
         }
       });
       this.$emit('reload');

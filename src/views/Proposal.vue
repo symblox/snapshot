@@ -18,10 +18,56 @@
               <span v-text="`#${id.slice(0, 7)}`" class="text-gray" />
             </h1>
             <State :proposal="proposal" class="mb-4" />
-            <UiMarkdown :body="payload.body" class="mb-6" />
+            <!-- <UiMarkdown :body="payload.body" class="mb-6" /> -->
           </template>
           <PageLoading v-else />
         </div>
+        <Block 
+          v-if="payload.state==='Succeeded'"
+          class="mb-4"
+          title="Queue"
+        >
+            <UiButton
+            @click="queue"
+            class="d-block width-full button--submit"
+          >
+            Queue
+          </UiButton>
+        </Block>
+        <Block
+          v-if="payload.state==='Queued'"
+          class="mb-4"
+          title="Execute"
+        >
+            <UiButton
+            @click="execute"
+            class="d-block width-full button--submit"
+          >
+            Execute
+          </UiButton>
+        </Block>
+        <Block
+          v-if="loaded && ts >= payload.start && ts < payload.end"
+          class="mb-4"
+          title="Delegate your vote"
+        >
+          <div class="mb-3">
+            <input
+              v-autofocus
+              v-model="delegateAddress"
+              maxlength="128"
+              class="h1 mb-2 input"
+              placeholder="Address"
+              style="width: 100%"
+            />
+          </div>
+          <UiButton
+            @click="delegate"
+            class="d-block width-full button--submit"
+          >
+            Delegate
+          </UiButton>
+        </Block>
         <Block
           v-if="loaded && ts >= payload.start && ts < payload.end"
           class="mb-4"
@@ -185,6 +231,7 @@ export default {
       modalStrategiesOpen: false,
       selectedChoice: 0,
       totalScore: 0,
+      delegateAddress: '',
       scores: []
     };
   },
@@ -193,7 +240,7 @@ export default {
       return this.app.spaces[this.key];
     },
     payload() {
-      return this.proposal.msg.payload;
+      return this.proposal.msg?this.proposal.msg.payload : {};
     },
     ts() {
       return (Date.now() / 1e3).toFixed();
@@ -208,11 +255,13 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getProposal', 'getPower']),
+    ...mapActions(['getProposal', 'getPower', 'send']),
     async loadProposal() {
+      console.log(this)
       const proposalObj = await this.getProposal({
         space: this.space,
-        id: this.id
+        id: this.id,
+        name: this.name
       });
       this.proposal = proposalObj.proposal;
       this.votes = proposalObj.votes;
@@ -223,10 +272,62 @@ export default {
       const { scores, totalScore } = await this.getPower({
         space: this.space,
         address: this.web3.account,
-        snapshot: this.payload.snapshot
+        // snapshot: this.payload.snapshot
       });
       this.totalScore = totalScore;
       this.scores = scores;
+    },
+    async delegate() {
+      try {
+        const result = await this.send({
+          type: 'delegate',
+          payload: {
+            contractType: "SYX",
+            contractAddress: this.space.token,
+            action: "delegate",
+            args: [this.delegateAddress]
+          }
+        });
+
+        this.loading = false;
+      } catch (e) {
+        console.error(e);
+        this.loading = false;
+      }
+    },
+    async queue() {
+      try {
+        const result = await this.send({
+          type: 'queue',
+          payload: {
+            contractType: "Governor",
+            contractAddress: this.space.governor,
+            action: "queue",
+            args: [this.id]
+          }
+        });
+        this.loading = false;
+      } catch (e) {
+        console.error(e);
+        this.loading = false;
+      }
+    },
+    async execute() {
+      try {
+        const result = await this.send({
+          type: 'queue',
+          payload: {
+            contractType: "Governor",
+            contractAddress: this.space.governor,
+            action: "execute",
+            args: [this.id]
+          }
+        });
+        this.loading = false;
+      } catch (e) {
+        console.error(e);
+        this.loading = false;
+      }
     }
   },
   async created() {
