@@ -42,6 +42,15 @@ const mutations = {
   SEND_FAILURE(_state, payload) {
     console.debug('SEND_FAILURE', payload);
   },
+  GET_USER_LAST_PROPOSAL_REQUEST() {
+    console.debug('GET_USER_LAST_PROPOSAL_REQUEST');
+  },
+ GET_USER_LAST_PROPOSAL_SUCCESS() {
+    console.debug('GET_USER_LAST_PROPOSAL_SUCCESS');
+  },
+  GET_USER_LAST_PROPOSAL_FAILURE() {
+    console.debug('GET_USER_LAST_PROPOSAL_FAILURE');
+  },
   GET_PROPOSALS_REQUEST() {
     console.debug('GET_PROPOSALS_REQUEST');
   },
@@ -106,16 +115,12 @@ const actions = {
     commit('SET', { spaces });
     return spaces;
   },
-  send: async ({ commit, dispatch, rootState }, { token, type, payload }) => {
+  send: async ({ commit, dispatch, rootState }, { type, payload }) => {
     const auth = getInstance();
-  
     commit('SEND_REQUEST');
     try {
-      console.log(payload.contractType, payload.contractAddress,payload.action,payload.targets,payload.values,payload.signatures,payload.calldatas,payload.name)
-      const result: any = await sendTransaction(auth.web3, [payload.contractType, payload.contractAddress,payload.action,[payload.targets,payload.values,payload.signatures,payload.calldatas,payload.name]]);
-
+      const result: any = await sendTransaction(auth.web3, [payload.contractType, payload.contractAddress,payload.action,[...payload.args]]);
       console.log("tx: ", result);
-
       commit('SEND_SUCCESS');
       dispatch('notify', ['green', `Your ${type} is in!`]);
       
@@ -131,7 +136,7 @@ const actions = {
     }
   },
   getLatestProposalIds: async ({ commit }, space) => {
-    commit('GET_USER_LAST_PROPOSAL');
+    commit('GET_USER_LAST_PROPOSAL_REQUEST');
     try {
       const auth = getInstance();
       const accounts = await auth.web3.listAccounts();
@@ -276,8 +281,9 @@ const actions = {
           }
         })
       );
+      result.votes = result.votes.filter(res => res != undefined);
 
-    const forVotes = proposal.forVotes/10**18, againstVotes = proposal.againstVotes;
+    const forVotes = proposal.forVotes/10**18, againstVotes = proposal.againstVotes/10**18;
       result.results = {
         // totalVotes: [proposal.forVotes, proposal.againstVotes],
         totalBalances: [forVotes, againstVotes],
@@ -293,19 +299,27 @@ const actions = {
   getPower: async ({ commit }, { space, address, snapshot }) => {
     commit('GET_POWER_REQUEST');
     try {
-      const blockNumber = await getBlockNumber(getProvider(space.network));
-      const blockTag = snapshot > blockNumber ? 'latest' : parseInt(snapshot);
-      let scores: any = await getScores(
-        space.strategies,
-        space.network,
-        getProvider(space.network),
-        [address],
-        // @ts-ignore
-        blockTag
-      );
-      scores = scores.map((score: any) =>
-        Object.values(score).reduce((a, b: any) => a + b, 0)
-      );
+      const auth = getInstance();
+      const contract = await getContract(space.token,"SYX",auth.web3);
+      const accounts = await auth.web3.listAccounts();
+      const balance = await contract.balanceOf(accounts[0]);
+
+      //const blockNumber = await getBlockNumber(getProvider(space.network));
+      //const blockTag = snapshot > blockNumber ? 'latest' : parseInt(snapshot);
+      // let scores: any = await getScores(
+      //   space.strategies,
+      //   space.network,
+      //   getProvider(space.network),
+      //   [address],
+      //   // @ts-ignore
+      //   blockTag
+      // );
+      // scores = scores.map((score: any) =>
+      //   Object.values(score).reduce((a, b: any) => a + b, 0)
+      // );
+
+      const scores: any = [balance/10**18];
+
       commit('GET_POWER_SUCCESS');
       return {
         scores,
