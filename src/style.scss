@@ -136,6 +136,27 @@ textarea {
   vertical-align: middle;
   padding: 0 12px;
   border-radius: 14px;
+  &.Pending {
+    background-color: #384AFF;
+  }
+  &.Active {
+    background-color: #409eff;
+  }
+  &.Canceled {
+    background-color: #909399;
+  }
+  &.Defeated {
+    background-color: #ff3856;
+  }
+  &.Succeeded {
+    background-color: #21b66f;
+  }
+  &.Queued {
+    background-color: #e6a23c;
+  }
+  &.Expired {
+    background-color: #21b66f;
+  }
 }
 
 .notification {
