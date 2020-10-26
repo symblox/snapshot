@@ -71,8 +71,8 @@
     "name": "VLX testnet",
     "chainId": 111,
     "network": "testnet",
-    "rpcUrl": "https://tn.yopta.net",
-    "explorer": "https://xtn.yopta.net"
+    "rpcUrl": "https://explorer.testnet.veladev.net/rpc",
+    "explorer": "https://explorer.testnet.veladev.net"
   },
   "137": {
     "name": "Matic Mainnet",

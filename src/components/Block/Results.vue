@@ -135,18 +135,13 @@ export default {
       const obj = Object.entries(this.votes)
         .map(vote => {
           return {
-            address: vote[0],
-            choice: vote[1].msg.payload.choice,
-            balance: vote[1].balance,
-            timestamp: vote[1].msg.timestamp,
-            dateUtc: new Date(
-              parseInt(vote[1].msg.timestamp) * 1e3
-            ).toUTCString(),
-            authorIpfsHash: vote[1].authorIpfsHash,
-            relayerIpfsHash: vote[1].relayerIpfsHash
+            address: vote[1].address,
+            choice: vote[1].msg.payload.choice === 1?true:false,
+            balance: vote[1].balance
           };
         })
         .sort((a, b) => a.timestamp - b.timestamp, 0);
+
       try {
         const csv = await jsonexport(obj);
         const link = document.createElement('a');
