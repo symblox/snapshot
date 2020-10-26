@@ -10,7 +10,28 @@
                             <UiCounter :counter="Object.keys(proposalsWithFilter).length" class="ml-1" />
                         </h2>
                     </div>
-                </div>
+                </div>  
+                <span v-text="'Delegatee Address'" class="pt-2"></span>
+                <UiButton
+                  @click="modalOpen = true"
+                  class="button-outline mx-md-4"
+                  :loading="loading"
+                >
+                  <Avatar
+                    v-if="delegatee!=='0x0000000000000000000000000000000000000000'"
+                    :address="delegatee"
+                    size="16"
+                    class="mr-0 mr-sm-2 mr-md-2 mr-lg-2 mr-xl-2 ml-n1"
+                  />
+                  <span v-if="delegatee!=='0x0000000000000000000000000000000000000000'" v-text="_shorten(delegatee)" class="hide-sm" />
+                  <span v-else v-text="'Set delegatee'" class="hide-sm" />
+                </UiButton>
+                <ModalDelegatee
+                  :open="modalOpen"
+                  @close="modalOpen = false"
+                  :space="space"
+                  :address="delegatee"
+                />
                 <router-link v-if="$auth.isAuthenticated" :to="{name: 'create', params: {key}}">
                     <UiButton>New proposal</UiButton>
                 </router-link>
@@ -57,7 +78,9 @@ export default {
             key: 'symblox', // Default project ID
             loading: false,
             loaded: false,
+            modalOpen: false,
             proposals: {},
+            delegatee: '',
             selectedState: 'all'
         };
     },
@@ -95,12 +118,13 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['getProposals'])
+        ...mapActions(['getProposals','getDelegatee'])
     },
     async created() {
         this.loading = true;
         this.selectedState = this.$route.params.tab || this.space.filters.defaultTab;
         this.proposals = await this.getProposals(this.space);
+        this.delegatee = await this.getDelegatee(this.space);
         this.loading = false;
         this.loaded = true;
     }

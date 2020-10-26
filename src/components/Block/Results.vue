@@ -31,7 +31,7 @@
       />
     </div>
     <div v-if="ts >= payload.end">
-      <UiButton
+      <!-- <UiButton
         v-if="
           _get(payload, 'metadata.plugins.aragon') &&
             _get(space, 'plugins.aragon')
@@ -48,8 +48,14 @@
           style="margin-top: -4px;"
         />
         Submit on-chain
+      </UiButton> -->
+      <UiButton v-if="payload.state === 'Succeeded'" @click="queue" class="d-block width-full button--submit">
+          Queue
       </UiButton>
-      <UiButton v-else @click="downloadReport" class="width-full mt-2">
+      <UiButton v-if="payload.state === 'Queued'" @click="execute" class="d-block width-full button--submit">
+          Execute
+      </UiButton>
+      <UiButton  @click="downloadReport" class="width-full mt-2">
         Download report
       </UiButton>
     </div>
@@ -90,7 +96,41 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['notify']),
+    ...mapActions(['notify','send']),
+    async queue() {
+        try {
+            const result = await this.send({
+                type: 'queue',
+                payload: {
+                    contractType: 'Governor',
+                    contractAddress: this.space.governor,
+                    action: 'queue',
+                    args: [this.id]
+                }
+            });
+            this.loading = false;
+        } catch (e) {
+            console.error(e);
+            this.loading = false;
+        }
+    },
+    async execute() {
+        try {
+            const result = await this.send({
+                type: 'queue',
+                payload: {
+                    contractType: 'Governor',
+                    contractAddress: this.space.governor,
+                    action: 'execute',
+                    args: [this.id]
+                }
+            });
+            this.loading = false;
+        } catch (e) {
+            console.error(e);
+            this.loading = false;
+        }
+    },
     async downloadReport() {
       const obj = Object.entries(this.votes)
         .map(vote => {
@@ -118,34 +158,34 @@ export default {
         console.error(e);
       }
     },
-    async submitOnChain() {
-      if (!this.space.plugins || !this.space.plugins.aragon) return;
-      this.loading = true;
-      const aragon = new plugins.Aragon();
-      const callsScript = aragon.execute(
-        this.space.plugins.aragon,
-        this.payload.metadata.plugins.aragon[`choice${this.winningChoice}`]
-      );
-      console.log(
-        `Submit on-chain
-Proposal #${this.id} on-chain
-Option: ${this.winningChoice}
-Callsscript: ${callsScript}`
-      );
-      try {
-        const tx = await sendTransaction(this.$auth.web3, [
-          'DisputableDelay',
-          this.space.plugins.aragon.disputableDelayAddress,
-          'delayExecution',
-          [callsScript, this.id]
-        ]);
-        console.log(tx);
-      } catch (e) {
-        console.error(e);
-      }
-      this.notify(['green', `The settlement is on-chain, congrats!`]);
-      this.loading = false;
-    }
+//     async submitOnChain() {
+//       if (!this.space.plugins || !this.space.plugins.aragon) return;
+//       this.loading = true;
+//       const aragon = new plugins.Aragon();
+//       const callsScript = aragon.execute(
+//         this.space.plugins.aragon,
+//         this.payload.metadata.plugins.aragon[`choice${this.winningChoice}`]
+//       );
+//       console.log(
+//         `Submit on-chain
+// Proposal #${this.id} on-chain
+// Option: ${this.winningChoice}
+// Callsscript: ${callsScript}`
+//       );
+//       try {
+//         const tx = await sendTransaction(this.$auth.web3, [
+//           'DisputableDelay',
+//           this.space.plugins.aragon.disputableDelayAddress,
+//           'delayExecution',
+//           [callsScript, this.id]
+//         ]);
+//         console.log(tx);
+//       } catch (e) {
+//         console.error(e);
+//       }
+//       this.notify(['green', `The settlement is on-chain, congrats!`]);
+//       this.loading = false;
+//     }
   }
 };
 </script>

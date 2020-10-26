@@ -51,6 +51,15 @@ const mutations = {
     GET_USER_LAST_PROPOSAL_FAILURE() {
         console.debug('GET_USER_LAST_PROPOSAL_FAILURE');
     },
+    GET_DELEGATEE_REQUEST() {
+        console.debug('GET_DELEGATEE_REQUEST');
+    },
+    GET_DELEGATEE_SUCCESS() {
+        console.debug('GET_DELEGATEE_SUCCESS');
+    },
+    GET_DELEGATEE_FAILURE() {
+        console.debug('GET_DELEGATEE_FAILURE');
+    },
     GET_PROPOSALS_REQUEST() {
         console.debug('GET_PROPOSALS_REQUEST');
     },
@@ -139,6 +148,19 @@ const actions = {
             return proposalId.toString();
         } catch (e) {
             commit('GET_USER_LAST_PROPOSAL_FAILURE', e);
+        }
+    },
+    getDelegatee: async ({commit}, space) => {
+        commit('GET_DELEGATEE_REQUEST');
+        try {
+            const auth = getInstance();
+            const contract = await getContract(space.token, 'SYX', auth.web3);
+            const accounts = await auth.web3.listAccounts();
+            const delegatee = await contract.delegates(accounts[0]);
+            commit('GET_DELEGATEE_SUCCESS');
+            return delegatee; 
+        } catch (e) {
+            commit('GET_DELEGATEE_FAILURE', e);
         }
     },
     getProposals: async ({commit}, space) => {

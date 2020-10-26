@@ -325,6 +325,9 @@ export default {
             params: {
               key: this.key,
               id
+            },
+            query: {
+              name: this.name
             }
           });
         }else{
