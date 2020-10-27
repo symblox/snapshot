@@ -220,6 +220,7 @@ export default {
       calldatas: [],
       blockNumber: -1,
       params: {},
+      scores: 0,
       form: {
         contractType: 'Governor',
         contractAddress: '',
@@ -261,13 +262,22 @@ export default {
     this.addCalldata(1);
     this.blockNumber = await getBlockNumber(getProvider(this.space.network));
     this.params = await this.getGovernorParams(this.space);
+    const {scores} = await this.getPower({
+                space: this.space,
+                address: this.web3.account
+            });
+    this.scores = scores || [];
     //console.log(this.params)
     // this.form.snapshot = this.blockNumber;
   },
   methods: {
-    ...mapActions(['send','getLatestProposalIds','getGovernorParams']),
+    ...mapActions(['send','getLatestProposalIds','getGovernorParams','getPower']),
     addTarget(num) {
-      // if(this.targets.length+num>parseFloat(this.params.proposalMaxOperations)
+      if(this.targets.length+num>parseFloat(this.params.proposalMaxOperations||10)){
+        this.$store.dispatch('notify', ['red', `proposal max operations is ${this.params.proposalMaxOperations}`]);
+        return;
+      }
+       
       for (let i = 1; i <= num; i++) {
         this.counter++;
         this.targets.push({ key: this.counter, text: '' });
@@ -277,6 +287,10 @@ export default {
       this.targets.splice(i, 1);
     },
     addValue(num) {
+      if(this.values.length+num>parseFloat(this.params.proposalMaxOperations||10)){
+        this.$store.dispatch('notify', ['red', `proposal max operations is ${this.params.proposalMaxOperations}`]);
+        return;
+      }
       for (let i = 1; i <= num; i++) {
         this.counter++;
         this.values.push({ key: this.counter, text: '' });
@@ -286,6 +300,10 @@ export default {
       this.values.splice(i, 1);
     },
     addSignature(num) {
+      if(this.signatures.length+num>parseFloat(this.params.proposalMaxOperations||10)){
+        this.$store.dispatch('notify', ['red', `proposal max operations is ${this.params.proposalMaxOperations}`]);
+        return;
+      }
       for (let i = 1; i <= num; i++) {
         this.counter++;
         this.signatures.push({ key: this.counter, text: '' });
@@ -295,6 +313,10 @@ export default {
       this.signatures.splice(i, 1);
     },
     addCalldata(num) {
+      if(this.calldatas.length+num>parseFloat(this.params.proposalMaxOperations||10)){
+        this.$store.dispatch('notify', ['red', `proposal max operations is ${this.params.proposalMaxOperations}`]);
+        return;
+      }
       for (let i = 1; i <= num; i++) {
         this.counter++;
         this.calldatas.push({ key: this.counter, text: '' });
@@ -309,6 +331,10 @@ export default {
     //   }
     // },
     async handleSubmit() {
+      if(parseFloat(this.scores[0])<parseFloat(this.params.proposalThreshold)){
+        this.$store.dispatch('notify', ['red', `proposer votes below proposal threshold, min is ${parseFloat(this.params.proposalThreshold).toFixed(2)} SYX`]);
+        return;
+      }
       this.loading = true;
       const targets = this.targets.map(target => target.text);
       const values = this.values.map(value => value.text);
