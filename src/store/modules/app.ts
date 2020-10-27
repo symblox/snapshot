@@ -51,6 +51,24 @@ const mutations = {
     GET_USER_LAST_PROPOSAL_FAILURE() {
         console.debug('GET_USER_LAST_PROPOSAL_FAILURE');
     },
+    GET_GOVERNOR_PARAMS_REQUEST() {
+        console.debug('GET_GOVERNOR_PARAMS_REQUEST');
+    },
+    GET_GOVERNOR_PARAMS_SUCCESS() {
+        console.debug('GET_GOVERNOR_PARAMS_SUCCESS');
+    },
+    GET_GOVERNOR_PARAMS_FAILURE() {
+        console.debug('GET_GOVERNOR_PARAMS_FAILURE');
+    },  
+    GET_DELEGATEE_REQUEST() {
+        console.debug('GET_DELEGATEE_REQUEST');
+    },
+    GET_DELEGATEE_SUCCESS() {
+        console.debug('GET_DELEGATEE_SUCCESS');
+    },
+    GET_DELEGATEE_FAILURE() {
+        console.debug('GET_DELEGATEE_FAILURE');
+    },
     GET_PROPOSALS_REQUEST() {
         console.debug('GET_PROPOSALS_REQUEST');
     },
@@ -139,6 +157,35 @@ const actions = {
             return proposalId.toString();
         } catch (e) {
             commit('GET_USER_LAST_PROPOSAL_FAILURE', e);
+        }
+    },
+    getDelegatee: async ({commit}, space) => {
+        commit('GET_DELEGATEE_REQUEST');
+        try {
+            const auth = getInstance();
+            const contract = await getContract(space.token, 'SYX', auth.web3);
+            const accounts = await auth.web3.listAccounts();
+            const delegatee = await contract.delegates(accounts[0]);
+            commit('GET_DELEGATEE_SUCCESS');
+            return delegatee; 
+        } catch (e) {
+            commit('GET_DELEGATEE_FAILURE', e);
+        }
+    },
+    getGovernorParams: async ({commit}, space) => {
+        commit('GET_GOVERNOR_PARAMS_REQUEST');
+        try {
+            const auth = getInstance();
+            const governorContract = await getContract(space.governor, 'Governor', auth.web3);
+            const proposalMaxOperations = await governorContract.proposalMaxOperations();
+            const proposalThreshold = await governorContract.proposalThreshold();
+            commit('GET_GOVERNOR_PARAMS_SUCCESS');
+            return {
+              proposalMaxOperations: proposalMaxOperations.toString(),
+              proposalThreshold: (proposalThreshold / 10 ** 18).toString()
+            };
+        } catch (e) {
+            commit('GET_GOVERNOR_PARAMS_FAILURE', e);
         }
     },
     getProposals: async ({commit}, space) => {

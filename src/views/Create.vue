@@ -219,6 +219,7 @@ export default {
       signatures: [],
       calldatas: [],
       blockNumber: -1,
+      params: {},
       form: {
         contractType: 'Governor',
         contractAddress: '',
@@ -259,11 +260,14 @@ export default {
     this.addSignature(1);
     this.addCalldata(1);
     this.blockNumber = await getBlockNumber(getProvider(this.space.network));
+    this.params = await this.getGovernorParams(this.space);
+    //console.log(this.params)
     // this.form.snapshot = this.blockNumber;
   },
   methods: {
-    ...mapActions(['send','getLatestProposalIds']),
+    ...mapActions(['send','getLatestProposalIds','getGovernorParams']),
     addTarget(num) {
+      // if(this.targets.length+num>parseFloat(this.params.proposalMaxOperations)
       for (let i = 1; i <= num; i++) {
         this.counter++;
         this.targets.push({ key: this.counter, text: '' });
@@ -325,6 +329,9 @@ export default {
             params: {
               key: this.key,
               id
+            },
+            query: {
+              name: this.name
             }
           });
         }else{

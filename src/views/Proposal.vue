@@ -19,31 +19,6 @@
                     </template>
                     <PageLoading v-else />
                 </div>
-                <Block v-if="payload.state === 'Succeeded'" class="mb-4" title="Queue">
-                    <UiButton @click="queue" class="d-block width-full button--submit">
-                        Queue
-                    </UiButton>
-                </Block>
-                <Block v-if="payload.state === 'Queued'" class="mb-4" title="Execute">
-                    <UiButton @click="execute" class="d-block width-full button--submit">
-                        Execute
-                    </UiButton>
-                </Block>
-                <Block v-if="loaded && ts >= payload.start && ts < payload.end" class="mb-4" title="Delegate your vote">
-                    <div class="mb-3">
-                        <input
-                            v-autofocus
-                            v-model="delegateAddress"
-                            maxlength="128"
-                            class="h1 mb-2 input"
-                            placeholder="Address"
-                            style="width: 100%"
-                        />
-                    </div>
-                    <UiButton @click="delegate" class="d-block width-full button--submit">
-                        Delegate
-                    </UiButton>
-                </Block>
                 <Block v-if="loaded && ts >= payload.start && ts < payload.end" class="mb-4" title="Cast your vote">
                     <div class="mb-3">
                         <UiButton
@@ -106,7 +81,7 @@
                         <b>ID</b>
                         <a class="float-right">
                             #{{ proposal.id }}
-                            <Icon name="external-link" class="ml-1" />
+                            <!-- <Icon name="external-link" class="ml-1" /> -->
                         </a>
                     </div>
                     <div>
@@ -206,6 +181,7 @@ export default {
     methods: {
         ...mapActions(['getProposal', 'getPower', 'send']),
         async loadProposal() {
+          this.name = "fff";
             const proposalObj = await this.getProposal({
                 space: this.space,
                 id: this.id,
@@ -224,58 +200,6 @@ export default {
             });
             this.totalScore = totalScore || 0;
             this.scores = scores || [];
-        },
-        async delegate() {
-            try {
-                const result = await this.send({
-                    type: 'delegate',
-                    payload: {
-                        contractType: 'SYX',
-                        contractAddress: this.space.token,
-                        action: 'delegate',
-                        args: [this.delegateAddress]
-                    }
-                });
-
-                this.loading = false;
-            } catch (e) {
-                console.error(e);
-                this.loading = false;
-            }
-        },
-        async queue() {
-            try {
-                const result = await this.send({
-                    type: 'queue',
-                    payload: {
-                        contractType: 'Governor',
-                        contractAddress: this.space.governor,
-                        action: 'queue',
-                        args: [this.id]
-                    }
-                });
-                this.loading = false;
-            } catch (e) {
-                console.error(e);
-                this.loading = false;
-            }
-        },
-        async execute() {
-            try {
-                const result = await this.send({
-                    type: 'queue',
-                    payload: {
-                        contractType: 'Governor',
-                        contractAddress: this.space.governor,
-                        action: 'execute',
-                        args: [this.id]
-                    }
-                });
-                this.loading = false;
-            } catch (e) {
-                console.error(e);
-                this.loading = false;
-            }
         }
     },
     async created() {
