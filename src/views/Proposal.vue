@@ -129,6 +129,7 @@
             :totalScore="totalScore"
             :scores="scores"
             :snapshot="payload.snapshot"
+            :delegatee="delegatee"
         />
         <ModalStrategies :open="modalStrategiesOpen" @close="modalStrategiesOpen = false" :space="space" :strategies="space.strategies" />
     </Container>
@@ -154,7 +155,7 @@ export default {
             modalStrategiesOpen: false,
             selectedChoice: 0,
             totalScore: 0,
-            delegateAddress: '',
+            delegatee: '',
             scores: []
         };
     },
@@ -188,7 +189,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['getProposal', 'getPower', 'send', 'getReceipt']),
+        ...mapActions(['getProposal', 'getPower', 'send', 'getReceipt','getDelegatee']),
         async loadProposal() {
             this.name = "fff";
             const proposalObj = await this.getProposal({
@@ -215,6 +216,7 @@ export default {
             });
             this.totalScore = totalScore || 0;
             this.scores = scores || [];
+            this.delegatee = await this.getDelegatee(this.space);
         }
     },
     async created() {

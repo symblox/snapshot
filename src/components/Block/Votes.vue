@@ -14,7 +14,7 @@
       <User :address="vote ? vote.address : {}" :space="space" class="column" />
       <div
         v-text="
-          proposal.msg.payload.choices[vote.msg.payload.choice.length - 1]
+          proposal.msg.payload.choices[vote.msg.payload.choice - 1]
         "
         class="flex-auto text-center text-white"
       />
