@@ -242,6 +242,20 @@ const actions = {
             commit('GET_PROPOSALS_FAILURE', e);
         }
     },
+    getReceipt: async ({commit}, payload) => {
+      try {
+        const auth = getInstance();
+        const accounts = await auth.web3.listAccounts();
+        const contract = await getContract(payload.space.governor, 'Governor', auth.web3);
+        const receipt = await contract.getReceipt(payload.id, accounts[0]);
+
+        return receipt
+      } catch (error) {
+        return {
+          hasVoted: false
+        };
+      }  
+    },
     getProposal: async ({commit}, payload) => {
         commit('GET_PROPOSAL_REQUEST');
         try {
@@ -267,7 +281,6 @@ const actions = {
             }
 
             const result: any = {};
-
             result.proposal = {
                 address: proposal.proposer,
                 id: proposal.id,
@@ -281,6 +294,7 @@ const actions = {
                         end: endTimestamp,
                         state: proposalState[stateId],
                         eta: proposal.eta
+                        //hasVoted: ,
                     }
                 }
             };

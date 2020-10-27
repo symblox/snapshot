@@ -46,7 +46,7 @@ export default {
                         args: [this.delegateAddress]
                     }
                 });
-
+                this.$emit('close');
                 this.loading = false;
             } catch (e) {
                 console.error(e);

@@ -19,7 +19,7 @@
                     </template>
                     <PageLoading v-else />
                 </div>
-                <Block v-if="loaded && ts >= payload.start && ts < payload.end" class="mb-4" title="Cast your vote">
+                <Block v-if="loaded && ts >= payload.start && ts < payload.end && !receipt.hasVoted" class="mb-4" title="Cast your vote">
                     <div class="mb-3">
                         <UiButton
                             v-for="(choice, i) in payload.choices"
@@ -148,6 +148,8 @@ export default {
             proposal: {},
             votes: {},
             results: [],
+            receipt: {},
+            hasVoted: false,
             modalOpen: false,
             modalStrategiesOpen: false,
             selectedChoice: 0,
@@ -175,14 +177,26 @@ export default {
     },
     watch: {
         'web3.account': async function(val, prev) {
-            if (val && val.toLowerCase() !== prev) await this.loadPower();
+            if (val && val.toLowerCase() !== prev){
+                this.loading = true;
+                this.loaded = false;
+                await this.loadPower();
+                await this.loadProposal();
+                this.loading = false;
+                this.loaded = true;
+            }
         }
     },
     methods: {
-        ...mapActions(['getProposal', 'getPower', 'send']),
+        ...mapActions(['getProposal', 'getPower', 'send', 'getReceipt']),
         async loadProposal() {
-          this.name = "fff";
+            this.name = "fff";
             const proposalObj = await this.getProposal({
+                space: this.space,
+                id: this.id,
+                name: this.name
+            });
+            this.receipt = await this.getReceipt({
                 space: this.space,
                 id: this.id,
                 name: this.name
@@ -190,6 +204,7 @@ export default {
             this.proposal = proposalObj.proposal;
             this.votes = proposalObj.votes;
             this.results = proposalObj.results;
+            this.hasVoted = proposalObj.hasVoted;
         },
         async loadPower() {
             if (!this.web3.account) return;
