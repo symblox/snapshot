@@ -51,10 +51,10 @@
                 <div class="px-4 py-3 bg-gray-dark overflow-auto menu-tabs rounded-top-0 rounded-md-top-2">
                     <router-link
                         v-for="state in states"
-                        :key="state"
-                        v-text="state"
-                        :to="`/${key}/${state}`"
-                        :class="selectedState === state && 'text-white'"
+                        :key="state.value"
+                        v-text="state.label"
+                        :to="`/${key}/${state.value}`"
+                        :class="selectedState === state.value && 'text-white'"
                         class="mr-3 text-gray tab"
                     />
                 </div>
@@ -71,7 +71,7 @@
                     />
                 </div>
                 <p v-if="loaded && Object.keys(proposalsWithFilter).length === 0" class="p-4 m-0 border-top d-block">
-                    There aren't any proposals here yet!
+                    {{ $t('page.suggestMsg') }}
                 </p>
             </Block>
         </Container>
@@ -102,7 +102,19 @@ export default {
             return space || {};
         },
         states() {
-            const states = ['all', 'pending', 'active', 'canceled', 'defeated', 'succeeded', 'queued', 'expired', 'executed'];
+            const states = [
+                {label: this.$t('page.all'), value: 'all'},
+                {label: this.$t('page.pending'), value: 'pending'},
+                {label: this.$t('page.active'), value: 'active'},
+                {label: this.$t('page.canceled'), value: 'canceled'},
+                {label: this.$t('page.defeated'), value: 'defeated'},
+                {label: this.$t('page.succeeded'), value: 'succeeded'},
+                {label: this.$t('page.queued'), value: 'queued'},
+                {label: this.$t('page.expired'), value: 'expired'},
+                {label: this.$t('page.executed'), value: 'executed'}
+            ];
+
+            // const states = ['all', 'pending', 'active', 'canceled', 'defeated', 'succeeded', 'queued', 'expired', 'executed'];
 
             return states;
             // return this.space.filters.onlyMembers
