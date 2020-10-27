@@ -279,7 +279,8 @@ const actions = {
                         choices: ['Yes', 'No'],
                         start: startTimestamp,
                         end: endTimestamp,
-                        state: proposalState[stateId]
+                        state: proposalState[stateId],
+                        eta: proposal.eta
                     }
                 }
             };
