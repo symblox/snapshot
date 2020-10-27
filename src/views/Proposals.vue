@@ -6,25 +6,34 @@
                     <div v-text="space.name" />
                     <div class="d-flex flex-items-center flex-auto">
                         <h2 class="mr-2">
-                            Proposals
+                            {{ $t('page.proposals') }}
                             <UiCounter :counter="Object.keys(proposalsWithFilter).length" class="ml-1" />
                         </h2>
                     </div>
                 </div>
-                <router-link v-if="$auth.isAuthenticated" :to="{name: 'create', params: {key}}">
-                    <UiButton>New proposal</UiButton>
+                <div class="delegatee-address-max">
+                    <span v-text="'Delegatee Address'" class="pt-2" style="flex: 1;margin-right: 10px;"></span>
+                    <UiButton @click="modalOpen = true" class="button-outline mx-md-4" :loading="loading">
+                        <Avatar
+                            v-if="delegatee !== '0x0000000000000000000000000000000000000000'"
+                            :address="delegatee"
+                            size="16"
+                            class="mr-0 mr-sm-2 mr-md-2 mr-lg-2 mr-xl-2 ml-n1"
+                        />
+                        <span v-if="delegatee !== '0x0000000000000000000000000000000000000000'" v-text="_shorten(delegatee)" class="hide-sm" />
+                        <span v-else v-text="'Set delegatee'" class="hide-sm" />
+                    </UiButton>
+                    <ModalDelegatee :open="modalOpen" @close="modalOpen = false" :space="space" :address="delegatee" />
+                </div>
+                <router-link class="new-proposal" v-if="$auth.isAuthenticated" :to="{name: 'create', params: {key}}">
+                    <UiButton>{{ $t('page.newProposal') }}</UiButton>
                 </router-link>
             </div>
         </Container>
         <Container>
-            <div class="mb-3" style="text-align: right;">
-                <span v-text="'Delegatee Address'" class="pt-2"></span>
-                <UiButton
-                    @click="modalOpen = true"
-                    class="button-outline mx-md-4"
-                    style="margin-right: 0px !important;margin-left: 20px !important;"
-                    :loading="loading"
-                >
+            <div class="delegatee-address-min">
+                <span v-text="'Delegatee Address'" class="pt-2" style="flex: 1;margin-right: 10px;"></span>
+                <UiButton @click="modalOpen = true" class="button-outline mx-md-4" :loading="loading">
                     <Avatar
                         v-if="delegatee !== '0x0000000000000000000000000000000000000000'"
                         :address="delegatee"

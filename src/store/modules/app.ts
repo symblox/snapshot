@@ -13,7 +13,8 @@ const secondsPerBlock = 5;
 const state = {
     init: false,
     loading: false,
-    spaces: {}
+    spaces: {},
+    language: 'en' // en || zh-CN
 };
 
 const proposalState = {
@@ -28,6 +29,9 @@ const proposalState = {
 };
 
 const mutations = {
+    SET_LANGUAGE: (state, language) => {
+        state.language = language;
+    },
     SET(_state, payload) {
         Object.keys(payload).forEach(key => {
             Vue.set(_state, key, payload[key]);
@@ -59,7 +63,7 @@ const mutations = {
     },
     GET_GOVERNOR_PARAMS_FAILURE() {
         console.debug('GET_GOVERNOR_PARAMS_FAILURE');
-    },  
+    },
     GET_DELEGATEE_REQUEST() {
         console.debug('GET_DELEGATEE_REQUEST');
     },
@@ -99,6 +103,9 @@ const mutations = {
 };
 
 const actions = {
+    setLanguage({commit}, language) {
+        commit('SET_LANGUAGE', language);
+    },
     init: async ({commit, dispatch}) => {
         commit('SET', {loading: true});
         const connector = await Vue.prototype.$auth.getConnector();
@@ -167,7 +174,7 @@ const actions = {
             const accounts = await auth.web3.listAccounts();
             const delegatee = await contract.delegates(accounts[0]);
             commit('GET_DELEGATEE_SUCCESS');
-            return delegatee; 
+            return delegatee;
         } catch (e) {
             commit('GET_DELEGATEE_FAILURE', e);
         }
@@ -181,8 +188,8 @@ const actions = {
             const proposalThreshold = await governorContract.proposalThreshold();
             commit('GET_GOVERNOR_PARAMS_SUCCESS');
             return {
-              proposalMaxOperations: proposalMaxOperations.toString(),
-              proposalThreshold: (proposalThreshold / 10 ** 18).toString()
+                proposalMaxOperations: proposalMaxOperations.toString(),
+                proposalThreshold: (proposalThreshold / 10 ** 18).toString()
             };
         } catch (e) {
             commit('GET_GOVERNOR_PARAMS_FAILURE', e);
