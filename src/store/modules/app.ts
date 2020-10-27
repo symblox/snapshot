@@ -260,7 +260,7 @@ const actions = {
             );
 
             commit('GET_PROPOSALS_SUCCESS');
-            return proposals;
+            return proposals.reverse();
         } catch (e) {
             commit('GET_PROPOSALS_FAILURE', e);
         }
