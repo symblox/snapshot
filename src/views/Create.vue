@@ -239,7 +239,7 @@ export default {
   },
   computed: {
     space() {
-      return this.app.spaces[this.key];
+      return this.app.spaces[this.key||"symblox"];
     },
     isValid() {
       // const ts = (Date.now() / 1e3).toFixed();
