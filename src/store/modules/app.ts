@@ -51,6 +51,15 @@ const mutations = {
     GET_USER_LAST_PROPOSAL_FAILURE() {
         console.debug('GET_USER_LAST_PROPOSAL_FAILURE');
     },
+    GET_PROPOSAL_STATE_REQUEST() {
+        console.debug('GET_PROPOSAL_STATE_REQUEST');
+    },
+    GET_PROPOSAL_STATE_SUCCESS() {
+        console.debug('GET_PROPOSAL_STATE_SUCCESS');
+    },
+    GET_PROPOSAL_STATE_FAILURE() {
+        console.debug('GET_PROPOSAL_STATE_FAILURE');
+    },
     GET_GOVERNOR_PARAMS_REQUEST() {
         console.debug('GET_GOVERNOR_PARAMS_REQUEST');
     },
@@ -157,6 +166,20 @@ const actions = {
             return proposalId.toString();
         } catch (e) {
             commit('GET_USER_LAST_PROPOSAL_FAILURE', e);
+        }
+    },
+    getProposalState: async ({commit}, {space, id}) => {
+      console.log('getProposalState')
+        commit('GET_PROPOSAL_STATE_REQUEST');
+        try {
+            const provider = getProvider(space.network);
+            const contract = await getContract(space.governor, 'Governor', provider);
+            const stateId = await contract.state(id);
+            commit('GET_PROPOSAL_STATE_SUCCESS');
+            return proposalState[stateId];
+        } catch (e) {
+            console.log(e)
+            commit('GET_PROPOSAL_STATE_FAILURE', e);
         }
     },
     getDelegatee: async ({commit}, space) => {
