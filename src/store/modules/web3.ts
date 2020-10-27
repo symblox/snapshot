@@ -6,14 +6,14 @@ import config from '@/helpers/config';
 import getProvider from '@/helpers/provider';
 import { formatUnits } from '@ethersproject/units';
 
-let wsProvider;
+// let wsProvider;
 let auth;
 
-if (wsProvider) {
-  wsProvider.on('block', blockNumber => {
-    store.commit('GET_BLOCK_SUCCESS', blockNumber);
-  });
-}
+// if (wsProvider) {
+//   wsProvider.on('block', blockNumber => {
+//     store.commit('GET_BLOCK_SUCCESS', blockNumber);
+//   });
+// }
 
 const state = {
   account: null,
