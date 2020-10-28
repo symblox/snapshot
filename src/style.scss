@@ -248,22 +248,25 @@ textarea {
 
 .delegatee-address-max {
     text-align: left;
-	display: black;
-	.button-outline {
-		margin-right: 0px !important;
-	}
+	  display: block;
+    .button-outline {
+        margin-right: 0px !important;
+    }
 }
 .new-proposal {
-	margin-left: 20px;
+	  margin-left: 20px;
 }
 .delegatee-address-min {
-	display: none;
+	  display: none;
+    .d-flex {
+      justify-content: flex-end;
+    }
 }
 @media all and (max-width: 767px) {
-	.delegatee-address-max {
-		display: none;
-	}
-	.delegatee-address-min {
-		display: black;
-	}
+    .delegatee-address-max {
+        display: none;
+    }
+    .delegatee-address-min {
+        display: block;
+    }
 }
