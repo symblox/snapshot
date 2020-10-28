@@ -1,5 +1,5 @@
 <template>
-    <span class="State" :class="state.class" v-text="stateText[state.name]" />
+    <span class="State" :class="state.class" v-text="state.name" />
 </template>
 
 <script>
@@ -8,8 +8,12 @@ export default {
         proposal: Object
     },
     data() {
-        return {
-            stateText: {
+        return {};
+    },
+    computed: {
+        state() {
+            const {state} = this.proposal.msg.payload;
+            const stateText = {
                 All: this.$t('page.all'),
                 Pending: this.$t('page.pending'),
                 Active: this.$t('page.active'),
@@ -19,13 +23,8 @@ export default {
                 Queued: this.$t('page.queued'),
                 Expired: this.$t('page.expired'),
                 Executed: this.$t('page.executed')
-            }
-        };
-    },
-    computed: {
-        state() {
-            const {state} = this.proposal.msg.payload;
-            return {name: state, class: state};
+            };
+            return {name: stateText[state], class: state};
         }
     }
 };
