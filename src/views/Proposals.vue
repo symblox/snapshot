@@ -138,14 +138,28 @@ export default {
             );
         }
     },
+    watch: {
+        'web3.account': async function(val, prev) {
+            if (val && val.toLowerCase() !== prev){
+                this.loading = true;
+                this.loaded = false;
+                await this.loadDelegatee();
+                this.loading = false;
+                this.loaded = true;
+            }
+        }
+    },
     methods: {
-        ...mapActions(['getProposals', 'getDelegatee'])
+        ...mapActions(['getProposals', 'getDelegatee']),
+        async loadDelegatee() {
+            this.delegatee = await this.getDelegatee(this.space);
+        },
     },
     async created() {
         this.loading = true;
         this.selectedState = this.$route.params.tab || this.space.filters.defaultTab;
         this.proposals = await this.getProposals(this.space);
-        this.delegatee = await this.getDelegatee(this.space);
+        await this.loadDelegatee();
         this.loading = false;
         this.loaded = true;
     }

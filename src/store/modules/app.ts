@@ -55,6 +55,15 @@ const mutations = {
     GET_USER_LAST_PROPOSAL_FAILURE() {
         console.debug('GET_USER_LAST_PROPOSAL_FAILURE');
     },
+    GET_PROPOSAL_STATE_REQUEST() {
+        console.debug('GET_PROPOSAL_STATE_REQUEST');
+    },
+    GET_PROPOSAL_STATE_SUCCESS() {
+        console.debug('GET_PROPOSAL_STATE_SUCCESS');
+    },
+    GET_PROPOSAL_STATE_FAILURE() {
+        console.debug('GET_PROPOSAL_STATE_FAILURE');
+    },
     GET_GOVERNOR_PARAMS_REQUEST() {
         console.debug('GET_GOVERNOR_PARAMS_REQUEST');
     },
@@ -166,6 +175,20 @@ const actions = {
             commit('GET_USER_LAST_PROPOSAL_FAILURE', e);
         }
     },
+    getProposalState: async ({commit}, {space, id}) => {
+      console.log('getProposalState')
+        commit('GET_PROPOSAL_STATE_REQUEST');
+        try {
+            const provider = getProvider(space.network);
+            const contract = await getContract(space.governor, 'Governor', provider);
+            const stateId = await contract.state(id);
+            commit('GET_PROPOSAL_STATE_SUCCESS');
+            return proposalState[stateId];
+        } catch (e) {
+            console.log(e)
+            commit('GET_PROPOSAL_STATE_FAILURE', e);
+        }
+    },
     getDelegatee: async ({commit}, space) => {
         commit('GET_DELEGATEE_REQUEST');
         try {
@@ -244,10 +267,24 @@ const actions = {
             );
 
             commit('GET_PROPOSALS_SUCCESS');
-            return proposals;
+            return proposals.reverse();
         } catch (e) {
             commit('GET_PROPOSALS_FAILURE', e);
         }
+    },
+    getReceipt: async ({commit}, payload) => {
+      try {
+        const auth = getInstance();
+        const accounts = await auth.web3.listAccounts();
+        const contract = await getContract(payload.space.governor, 'Governor', auth.web3);
+        const receipt = await contract.getReceipt(payload.id, accounts[0]);
+
+        return receipt
+      } catch (error) {
+        return {
+          hasVoted: false
+        };
+      }  
     },
     getProposal: async ({commit}, payload) => {
         commit('GET_PROPOSAL_REQUEST');
@@ -274,7 +311,6 @@ const actions = {
             }
 
             const result: any = {};
-
             result.proposal = {
                 address: proposal.proposer,
                 id: proposal.id,
@@ -288,6 +324,7 @@ const actions = {
                         end: endTimestamp,
                         state: proposalState[stateId],
                         eta: proposal.eta
+                        //hasVoted: ,
                     }
                 }
             };

@@ -28,7 +28,7 @@
         <div class="d-flex">
           <span v-text="'Your voting power'" class="flex-auto text-gray mr-1" />
            <span>
-            {{ _numeral(scores[0]) }}
+            {{ _numeral(totalScore) }}
             SYX
            
           </span>
@@ -71,7 +71,7 @@ export default {
     'proposal',
     'id',
     'selectedChoice',
-    // 'snapshot',
+    'delegatee',
     'totalScore',
     'scores'
   ],
@@ -88,6 +88,11 @@ export default {
   methods: {
     ...mapActions(['send']),
     async handleSubmit() {
+      if(parseFloat(this.totalScore)<=0 || this.delegatee !== this.web3.account){
+        this.$store.dispatch('notify', ['red', `your votes is zero or delegatee is not you self`]);
+        return;
+      }
+      
       this.loading = true;
       await this.send({
         type: 'proposal',

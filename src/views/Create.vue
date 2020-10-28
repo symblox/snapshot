@@ -221,6 +221,8 @@ export default {
       blockNumber: -1,
       params: {},
       scores: 0,
+      delegatee: '',
+      latestProposalState: '',
       form: {
         contractType: 'Governor',
         contractAddress: '',
@@ -261,17 +263,36 @@ export default {
     this.addSignature(1);
     this.addCalldata(1);
     this.blockNumber = await getBlockNumber(getProvider(this.space.network));
-    this.params = await this.getGovernorParams(this.space);
-    const {scores} = await this.getPower({
-                space: this.space,
-                address: this.web3.account
-            });
-    this.scores = scores || [];
+    await this.loadData();
+  
     //console.log(this.params)
     // this.form.snapshot = this.blockNumber;
   },
+  watch: {
+      'web3.account': async function(val, prev) {
+          if (val && val.toLowerCase() !== prev){
+              this.loading = true;
+              await this.loadData();
+              this.loading = false;
+          }
+      }
+  },
   methods: {
-    ...mapActions(['send','getLatestProposalIds','getGovernorParams','getPower']),
+    ...mapActions(['send','getLatestProposalIds','getGovernorParams','getPower','getDelegatee','getProposalState']),
+    async loadData() {
+      this.params = await this.getGovernorParams(this.space);
+      this.delegatee = await this.getDelegatee(this.space);
+      const {scores} = await this.getPower({
+          space: this.space,
+          address: this.web3.account
+      });
+      this.scores = scores || [];
+      const id = await this.getLatestProposalIds(this.space);
+      this.latestProposalState = await this.getProposalState({
+          space: this.space,
+          id
+      });
+    },
     addTarget(num) {
       if(this.targets.length+num>parseFloat(this.params.proposalMaxOperations||10)){
         this.$store.dispatch('notify', ['red', `proposal max operations is ${this.params.proposalMaxOperations}`]);
@@ -331,10 +352,20 @@ export default {
     //   }
     // },
     async handleSubmit() {
+      if(this.latestProposalState === "Pending" || this.latestProposalState === "Active"){
+        this.$store.dispatch('notify', ['red', `already has a active or pending proposal`]);
+        return;
+      }
       if(parseFloat(this.scores[0])<parseFloat(this.params.proposalThreshold)){
         this.$store.dispatch('notify', ['red', `proposer votes below proposal threshold, min is ${parseFloat(this.params.proposalThreshold).toFixed(2)} SYX`]);
         return;
       }
+
+      if(this.delegatee !== this.web3.account){
+        this.$store.dispatch('notify', ['red', `delegatee is not you self`]);
+        return;
+      }
+
       this.loading = true;
       const targets = this.targets.map(target => target.text);
       const values = this.values.map(value => value.text);
