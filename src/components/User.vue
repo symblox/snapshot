@@ -15,20 +15,29 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+
 export default {
   props: ['address', 'space'],
   data() {
     return {
-      modalOpen: false
+      modalOpen: false,
+      vlxAddress: ''
     };
+  },
+  async mounted() {
+      this.vlxAddress = await this.ethToVlx(this.address);
   },
   computed: {
     name() {
       return this.web3.account &&
         this.address.toLowerCase() === this.web3.account.toLowerCase()
         ? 'You'
-        : this._shorten(this.address);
+        : this._shorten(this.vlxAddress);
     }
+  },
+  methods: {
+    ...mapActions(['ethToVlx'])
   }
 };
 </script>

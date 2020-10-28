@@ -28,14 +28,14 @@
       <h3 class="m-4 mb-0 text-center">{{$t('page.account')}}</h3>
       <div v-if="$auth.isAuthenticated" class="m-4">
         <a
-          :href="_explorer(web3.network.chainId, web3.account)"
+          :href="_explorer(web3.network.chainId, addressVlx)"
           target="_blank"
           class="mb-2 d-block"
         >
           <UiButton class="button-outline width-full">
             <Avatar :address="web3.account" size="16" class="mr-2 ml-n1" />
             <span v-if="web3.name" v-text="web3.name" />
-            <span v-else v-text="_shorten(web3.account)" />
+            <span v-else v-text="_shorten(addressVlx)" />
             <Icon name="external-link" class="ml-1" />
           </UiButton>
         </a>
@@ -63,7 +63,8 @@ export default {
   props: ['open'],
   data() {
     return {
-      step: null
+      step: null,
+      addressVlx: ''
     };
   },
   watch: {
@@ -71,8 +72,11 @@ export default {
       this.step = null;
     }
   },
+  async mounted() {
+      this.addressVlx = await this.ethToVlx(this.web3.account);
+  },
   methods: {
-    ...mapActions(['logout']),
+    ...mapActions(['logout','ethToVlx']),
     async handleLogout() {
       await this.logout();
       this.$emit('close');

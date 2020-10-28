@@ -9,7 +9,7 @@
         </div>
         <div>
             <span v-text="`#${proposal.id}`" />
-            By {{ _shorten(proposal.address) }}
+            By {{ _shorten(addressVlx) }}
             <Badges :address="proposal.address" :space="space" class="ml-n1" />
             <Icon v-if="isVerified" name="check" title="Verified" />
             start
@@ -21,13 +21,26 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+
 export default {
+    data() {
+        return { 
+            addressVlx: ''
+        };
+    },
     props: {
         space: Object,
         token: String,
         proposal: Object,
         verified: Array,
         i: String
+    },
+    async mounted() {
+        this.addressVlx = await this.ethToVlx(this.proposal.address);
+    },
+    methods: {
+        ...mapActions(['ethToVlx'])
     },
     computed: {
         isVerified() {

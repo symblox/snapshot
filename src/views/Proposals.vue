@@ -20,7 +20,7 @@
                             size="16"
                             class="mr-0 mr-sm-2 mr-md-2 mr-lg-2 mr-xl-2 ml-n1"
                         />
-                        <span v-if="delegatee !== '0x0000000000000000000000000000000000000000'" v-text="_shorten(delegatee)" class="hide-sm" />
+                        <span v-if="delegatee !== '0x0000000000000000000000000000000000000000'" v-text="_shorten(delegateeVlx)" class="hide-sm" />
                         <span v-else v-text="$t('page.setDelegatee')" class="hide-sm" />
                     </UiButton>
                     <ModalDelegatee :open="modalOpen" @close="modalOpen = false" :space="space" :address="delegatee" />
@@ -41,7 +41,7 @@
                             size="16"
                             class="mr-0 mr-sm-2 mr-md-2 mr-lg-2 mr-xl-2 ml-n1"
                         />
-                        <span v-if="delegatee !== '0x0000000000000000000000000000000000000000'" v-text="_shorten(delegatee)" class="hide-sm" />
+                        <span v-if="delegatee !== '0x0000000000000000000000000000000000000000'" v-text="_shorten(delegateeVlx)" class="hide-sm" />
                         <span v-else v-text="$t('page.setDelegatee')" class="hide-sm" />
                     </UiButton>
                     <ModalDelegatee :open="modalOpen" @close="modalOpen = false" :space="space" :address="delegatee" />
@@ -92,6 +92,7 @@ export default {
             modalOpen: false,
             proposals: {},
             delegatee: '',
+            delegateeVlx: '',
             selectedState: 'all'
         };
     },
@@ -152,9 +153,10 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['getProposals', 'getDelegatee']),
+        ...mapActions(['getProposals', 'getDelegatee','ethToVlx']),
         async loadDelegatee() {
             this.delegatee = await this.getDelegatee(this.space);
+            this.delegateeVlx = await this.ethToVlx(this.delegatee);
         },
     },
     async created() {

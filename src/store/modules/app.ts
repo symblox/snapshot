@@ -3,6 +3,7 @@ import {getInstance} from '@snapshot-labs/lock/plugins/vue';
 import {getScores} from '@snapshot-labs/snapshot.js/src/utils';
 import client from '@/helpers/client';
 import ipfs from '@/helpers/ipfs';
+import {vlxToEth, ethToVlx} from '@/helpers/vlxAddressConversion';
 import getProvider from '@/helpers/provider';
 import {formatProposal, formatProposals, formatSpace} from '@/helpers/utils';
 import {getBlockNumber, getBlockTimestamp, signMessage, getContract, sendTransaction} from '@/helpers/web3';
@@ -124,6 +125,12 @@ const actions = {
     },
     loading: ({commit}, payload) => {
         commit('SET', {loading: payload});
+    },
+    ethToVlx({commit}, address) {
+      return ethToVlx(address);
+    },
+    vlxToEth({commit}, address) {
+      return vlxToEth(address);
     },
     getSpaces: async ({commit}) => {
         //let spaces: any = await client.request('spaces');
@@ -341,6 +348,7 @@ const actions = {
                     if (proposalId.toString() === payload.id) {
                         return {
                             address: voter,
+                            addressVlx: ethToVlx(voter),
                             msg: {
                                 type: 'vote',
                                 payload: {

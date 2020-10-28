@@ -30,7 +30,7 @@
                             <UiButton @click="modalOpen = true" class="button-outline" :loading="loading">
                                 <Avatar :address="web3.account" size="16" class="mr-0 mr-sm-2 mr-md-2 mr-lg-2 mr-xl-2 ml-n1" />
                                 <span v-if="web3.name" v-text="web3.name" class="hide-sm" />
-                                <span v-else v-text="_shorten(web3.account)" class="hide-sm" />
+                                <span v-else v-text="_shorten(addressVlx)" class="hide-sm" />
                             </UiButton>
                         </template>
                         <UiButton v-if="!$auth.isAuthenticated" @click="modalOpen = true" :loading="loading">
@@ -58,7 +58,8 @@ export default {
         return {
             loading: false,
             modalOpen: false,
-            modalAboutOpen: false
+            modalAboutOpen: false,
+            addressVlx: ''
         };
     },
     computed: {
@@ -67,8 +68,11 @@ export default {
             return this.app.spaces[key] ? this.app.spaces[key] : false;
         }
     },
+    async mounted() {
+        this.addressVlx = await this.ethToVlx(this.web3.account);
+    },
     methods: {
-        ...mapActions(['login']),
+        ...mapActions(['login','ethToVlx']),
         async handleLogin(connector) {
             this.modalOpen = false;
             this.loading = true;
