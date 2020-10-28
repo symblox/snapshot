@@ -1,5 +1,5 @@
 <template>
-  <Block :title="ts >= payload.end ? 'Results' : 'Current results'">
+  <Block :title="ts >= payload.end ? $t('page.results') : $t('page.currentResults')">
     <div v-for="(choice, i) in payload.choices" :key="i">
       <div class="text-white mb-1">
         <span v-text="_shorten(choice, 'choice')" class="mr-1" />
@@ -50,21 +50,21 @@
         Submit on-chain
       </UiButton> -->
       <UiButton v-if="payload.state === 'Succeeded'" @click="queue" class="d-block width-full button--submit">
-          Queue
+        {{$t('page.queue')}}
       </UiButton>
       <div v-if="payload.state === 'Queued'" class="mb-1">
-          <b>eta</b>
-          <span
-              :aria-label="_ms(payload.eta)"
-              v-text="$d(payload.eta * 1e3, 'short')"
-              class="float-right text-white tooltipped tooltipped-n"
-          />
+        <b>{{$t('page.eta')}}</b>
+        <span
+            :aria-label="_ms(payload.eta)"
+            v-text="$d(payload.eta * 1e3, 'short')"
+            class="float-right text-white tooltipped tooltipped-n"
+        />
       </div>
       <UiButton v-if="payload.state === 'Queued'" @click="execute" class="d-block width-full button--submit">
-          Execute
+        {{$t('page.execute')}}
       </UiButton>
       <UiButton  @click="downloadReport" class="width-full mt-2">
-        Download report
+        {{$t('page.downloadReport')}}
       </UiButton>
     </div>
   </Block>

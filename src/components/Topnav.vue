@@ -34,7 +34,7 @@
                             </UiButton>
                         </template>
                         <UiButton v-if="!$auth.isAuthenticated" @click="modalOpen = true" :loading="loading">
-                            <span class="hide-sm" v-text="'Connect wallet'" />
+                            <span class="hide-sm" v-text="$t('page.connectWallet')" />
                             <Icon name="login" size="20" class="hide-md hide-lg hide-xl ml-n2 mr-n2 v-align-text-bottom" />
                         </UiButton>
                         <UiButton @click="modalAboutOpen = true" class="ml-2">

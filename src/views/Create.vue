@@ -18,7 +18,7 @@
               v-model="name"
               maxlength="128"
               class="h1 mb-2 input"
-              placeholder="Question"
+              :placeholder="$t('page.createTitle')"
             />
             <!-- <textarea-autosize
               v-model="form.body"
@@ -32,7 +32,7 @@
             </div> -->
           </div>
         </div>
-        <Block title="Targets">
+        <Block :title="$t('page.targets')">
           <div v-if="targets.length > 0" class="overflow-hidden mb-2">
             <draggable v-model="targets">
               <transition-group name="list">
@@ -56,10 +56,10 @@
             </draggable>
           </div>
           <UiButton @click="addTarget(1)" class="d-block width-full">
-            Add target
+            {{$t('page.addTarget')}}
           </UiButton>
         </Block>
-        <Block title="Values">
+        <Block :title="$t('page.values')">
           <div v-if="values.length > 0" class="overflow-hidden mb-2">
             <draggable v-model="values">
               <transition-group name="list">
@@ -83,10 +83,10 @@
             </draggable>
           </div>
           <UiButton @click="addValue(1)" class="d-block width-full">
-            Add value
+            {{$t('page.addValue')}}
           </UiButton>
         </Block>
-        <Block title="Signature">
+        <Block :title="$t('page.signatures')">
           <div v-if="signatures.length > 0" class="overflow-hidden mb-2">
             <draggable v-model="signatures">
               <transition-group name="list">
@@ -110,10 +110,10 @@
             </draggable>
           </div>
           <UiButton @click="addSignature(1)" class="d-block width-full">
-            Add signature
+            {{$t('page.addSignature')}}
           </UiButton>
         </Block>
-        <Block title="Calldatas">
+        <Block :title="$t('page.calldatas')">
           <div v-if="calldatas.length > 0" class="overflow-hidden mb-2">
             <draggable v-model="calldatas">
               <transition-group name="list">
@@ -137,13 +137,13 @@
             </draggable>
           </div>
           <UiButton @click="addCalldata(1)" class="d-block width-full">
-            Add calldata
+            {{$t('page.addCalldata')}}
           </UiButton>
         </Block>
       </div>
       <div class="col-12 col-lg-4 float-left">
         <Block
-          title="Actions"
+          :title="$t('page.action')"
           :icon="space.network === '4' ? 'stars' : undefined"
           @submit="modalPluginsOpen = true"
         >
@@ -177,7 +177,7 @@
             :loading="loading"
             class="d-block width-full button--submit"
           >
-            Publish
+            {{$t('page.publish')}}
           </UiButton>
         </Block>
       </div>

@@ -19,7 +19,7 @@
                     </template>
                     <PageLoading v-else />
                 </div>
-                <Block v-if="loaded && ts >= payload.start && ts < payload.end && !receipt.hasVoted" class="mb-4" title="Cast your vote">
+                <Block v-if="loaded && ts >= payload.start && ts < payload.end && !receipt.hasVoted" class="mb-4" :title="$t('page.voteTitle')">
                     <div class="mb-3">
                         <UiButton
                             v-for="(choice, i) in payload.choices"
@@ -49,13 +49,13 @@
                         @click="modalOpen = true"
                         class="d-block width-full button--submit"
                     >
-                        Vote
+                        {{$t('page.vote')}}
                     </UiButton>
                 </Block>
                 <BlockVotes v-if="loaded" :space="space" :proposal="proposal" :votes="votes" />
             </div>
             <div v-if="loaded" class="col-12 col-lg-4 float-left">
-                <Block title="Information">
+                <Block :title="$t('page.information')">
                     <!-- <div class="mb-1 overflow-hidden">
             <b>Token(s)</b>
             <a
@@ -74,11 +74,11 @@
             </a>
           </div> -->
                     <div class="mb-1">
-                        <b>Author</b>
+                        <b>{{$t('page.author')}}</b>
                         <User :address="proposal.address" :space="space" class="float-right" />
                     </div>
                     <div class="mb-1">
-                        <b>ID</b>
+                        <b>{{$t('page.id')}}</b>
                         <a class="float-right">
                             #{{ proposal.id }}
                             <!-- <Icon name="external-link" class="ml-1" /> -->
@@ -86,7 +86,7 @@
                     </div>
                     <div>
                         <div class="mb-1">
-                            <b>Start date</b>
+                            <b>{{$t('page.startDate')}}</b>
                             <span
                                 :aria-label="_ms(payload.start)"
                                 v-text="$d(payload.start * 1e3, 'short')"
@@ -94,7 +94,7 @@
                             />
                         </div>
                         <div class="mb-1">
-                            <b>End date</b>
+                            <b>{{$t('page.endDate')}}</b>
                             <span
                                 :aria-label="_ms(payload.end)"
                                 v-text="$d(payload.end * 1e3, 'short')"

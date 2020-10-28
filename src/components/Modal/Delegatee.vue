@@ -3,7 +3,7 @@
     <div class="m-4 mb-0 text-center">
       <Avatar :address="address" size="64" class="mb-4" />
       <h3 v-if="address!=='0x0000000000000000000000000000000000000000'" v-text="_shorten(address)" />
-      <h3 v-else v-text="'Set delegatee'" />
+      <h3 v-else v-text="$t('page.setDelegatee')" />
     </div>
     <div class="m-4">
         <input
@@ -11,13 +11,13 @@
             v-model="delegateAddress"
             maxlength="128"
             class="h1 mb-2 input"
-            placeholder="Address"
+            :placeholder="$t('page.address')"
             style="width: 100%"
         />
     </div>
     <div class="m-4">
         <UiButton class="button--submit width-full" @click="delegate">
-            Delegate
+            {{$t('page.delegate')}}
         </UiButton>
     </div>
   </UiModal>

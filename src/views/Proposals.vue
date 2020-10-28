@@ -12,7 +12,7 @@
                     </div>
                 </div>
                 <div class="delegatee-address-max">
-                    <span v-text="'Delegatee Address'" class="pt-2" style="flex: 1;margin-right: 10px;"></span>
+                    <span v-text="$t('page.delegatee')" class="pt-2" style="flex: 1;margin-right: 10px;"></span>
                     <UiButton @click="modalOpen = true" class="button-outline mx-md-4" :loading="loading">
                         <Avatar
                             v-if="delegatee !== '0x0000000000000000000000000000000000000000'"
@@ -21,7 +21,7 @@
                             class="mr-0 mr-sm-2 mr-md-2 mr-lg-2 mr-xl-2 ml-n1"
                         />
                         <span v-if="delegatee !== '0x0000000000000000000000000000000000000000'" v-text="_shorten(delegatee)" class="hide-sm" />
-                        <span v-else v-text="'Set delegatee'" class="hide-sm" />
+                        <span v-else v-text="$t('page.setDelegatee')" class="hide-sm" />
                     </UiButton>
                     <ModalDelegatee :open="modalOpen" @close="modalOpen = false" :space="space" :address="delegatee" />
                 </div>
@@ -33,7 +33,7 @@
         <Container>
             <div class="delegatee-address-min mb-3">
                 <div class="d-flex flex-items-center flex-auto">
-                    <span v-text="'Delegatee Address'" class="mr-2"></span>
+                    <span v-text="$t('page.delegatee')" class="mr-2"></span>
                     <UiButton @click="modalOpen = true" class="button-outline mx-md-4" :loading="loading">
                         <Avatar
                             v-if="delegatee !== '0x0000000000000000000000000000000000000000'"
@@ -42,7 +42,7 @@
                             class="mr-0 mr-sm-2 mr-md-2 mr-lg-2 mr-xl-2 ml-n1"
                         />
                         <span v-if="delegatee !== '0x0000000000000000000000000000000000000000'" v-text="_shorten(delegatee)" class="hide-sm" />
-                        <span v-else v-text="'Set delegatee'" class="hide-sm" />
+                        <span v-else v-text="$t('page.setDelegatee')" class="hide-sm" />
                     </UiButton>
                     <ModalDelegatee :open="modalOpen" @close="modalOpen = false" :space="space" :address="delegatee" />
                 </div>
