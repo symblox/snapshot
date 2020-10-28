@@ -320,6 +320,8 @@ const actions = {
                     payload: {
                         name: payload.name,
                         choices: ['Yes', 'No'],
+                        startBlock: proposal.startBlock,
+                        endBlock: proposal.endBlock,
                         start: startTimestamp,
                         end: endTimestamp,
                         state: proposalState[stateId],
@@ -367,14 +369,16 @@ const actions = {
             commit('GET_PROPOSAL_FAILURE', e);
         }
     },
-    getPower: async ({commit}, {space, address, snapshot}) => {
+    getPower: async ({commit}, {space, address, blockNumber}) => {
         commit('GET_POWER_REQUEST');
         try {
-            const auth = getInstance();
-            const contract = await getContract(space.token, 'SYX', auth.web3);
-            const accounts = await auth.web3.listAccounts();
-            const balance = await contract.balanceOf(accounts[0]);
-            //const blockNumber = await getBlockNumber(getProvider(space.network));
+            const provider = getProvider(space.network);
+            const contract = await getContract(space.token, 'SYX', provider);
+            if(!blockNumber){
+              blockNumber = await getBlockNumber(getProvider(space.network));
+            }
+            const balance = await contract.getPriorVotes(address, blockNumber);
+            
             //const blockTag = snapshot > blockNumber ? 'latest' : parseInt(snapshot);
             // let scores: any = await getScores(
             //   space.strategies,

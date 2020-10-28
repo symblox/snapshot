@@ -284,7 +284,8 @@ export default {
       this.delegatee = await this.getDelegatee(this.space);
       const {scores} = await this.getPower({
           space: this.space,
-          address: this.web3.account
+          address: this.web3.account,
+          blockNumber: null
       });
       this.scores = scores || [];
       const id = await this.getLatestProposalIds(this.space);

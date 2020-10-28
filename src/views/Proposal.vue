@@ -19,7 +19,7 @@
                     </template>
                     <PageLoading v-else />
                 </div>
-                <Block v-if="loaded && ts >= payload.start && ts < payload.end && !receipt.hasVoted" class="mb-4" :title="$t('page.voteTitle')">
+                <Block v-if="loaded && payload.state === 'Active' && !receipt.hasVoted" class="mb-4" :title="$t('page.voteTitle')">
                     <div class="mb-3">
                         <UiButton
                             v-for="(choice, i) in payload.choices"
@@ -211,8 +211,8 @@ export default {
             if (!this.web3.account) return;
             const {scores, totalScore} = await this.getPower({
                 space: this.space,
-                address: this.web3.account
-                // snapshot: this.payload.snapshot
+                address: this.web3.account,
+                blockNumber: this.payload.startBlock
             });
             this.totalScore = totalScore || 0;
             this.scores = scores || [];
