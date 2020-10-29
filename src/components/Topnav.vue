@@ -63,10 +63,14 @@ export default {
         };
     },
     computed: {
-        space() {
-            // const key = this.domain || this.$route.params.key;
-            // return this.app.spaces[key] ? this.app.spaces[key] : false;
-            return this.app.spaces[this.web3.network.chainId];
+        space: {
+            get: function () {
+                const space = this.app.spaces[this.web3.network.chainId];
+                return space || {};
+            },
+            set: function (newValue) {
+                this.space = newValue;
+            }
         }
     },
     async mounted() {

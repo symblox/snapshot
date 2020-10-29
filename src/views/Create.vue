@@ -241,8 +241,14 @@ export default {
     };
   },
   computed: {
-    space() {
-      return this.app.spaces[this.web3.network.chainId];
+    space: {
+      get: function () {
+        const space = this.app.spaces[this.web3.network.chainId];
+        return space || {};
+      },
+      set: function (newValue) {
+        this.space = newValue;
+      }
     },
     isValid() {
       // const ts = (Date.now() / 1e3).toFixed();
@@ -361,6 +367,7 @@ export default {
     //   }
     // },
     async handleSubmit() {
+      console.log(this.params, this.scores);
       if(!this.params || !this.params.proposalThreshold || !this.scores){
         this.$store.dispatch('notify', ['red', `not contract data`]);
         return;

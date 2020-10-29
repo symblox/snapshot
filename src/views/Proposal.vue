@@ -160,8 +160,14 @@ export default {
         };
     },
     computed: {
-        space() {
-            return this.app.spaces[this.web3.network.chainId];
+        space: {
+            get: function () {
+                const space = this.app.spaces[this.web3.network.chainId];
+                return space || {};
+            },
+            set: function (newValue) {
+                this.space = newValue;
+            }
         },
         payload() {
             return this.proposal.msg ? this.proposal.msg.payload : {};
