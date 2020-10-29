@@ -23,7 +23,7 @@
                         <span v-if="delegatee !== '0x0000000000000000000000000000000000000000'" v-text="_shorten(delegateeVlx)" class="hide-sm" />
                         <span v-else v-text="$t('page.setDelegatee')" class="hide-sm" />
                     </UiButton>
-                    <ModalDelegatee :open="modalOpen" @close="modalOpen = false" :space="space" :address="delegatee" />
+                    <ModalDelegatee :open="modalOpen" @close="modalOpen = false" :space="space" :address="delegatee" @loadDelegatee="loadDelegatee" />
                 </div>
                 <router-link class="new-proposal" v-if="$auth.isAuthenticated" :to="{name: 'create', params: {key}}">
                     <UiButton>{{ $t('page.newProposal') }}</UiButton>
@@ -44,7 +44,7 @@
                         <span v-if="delegatee !== '0x0000000000000000000000000000000000000000'" v-text="_shorten(delegateeVlx)" class="hide-sm" />
                         <span v-else v-text="$t('page.setDelegatee')" class="hide-sm" />
                     </UiButton>
-                    <ModalDelegatee :open="modalOpen" @close="modalOpen = false" :space="space" :address="delegatee" />
+                    <ModalDelegatee :open="modalOpen" @close="modalOpen = false" :space="space" :address="delegatee" @loadDelegatee="loadDelegatee" />
                 </div>
             </div>
         </Container>

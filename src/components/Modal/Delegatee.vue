@@ -59,6 +59,7 @@ export default {
                     }
                 });
                 this.$emit('close');
+                this.$emit('loadDelegatee')
                 this.loading = false;
             } catch (e) {
                 console.error(e);
