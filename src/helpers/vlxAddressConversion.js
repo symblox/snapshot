@@ -20,7 +20,7 @@ function sha256(string) {
 }
 
 export function ethToVlx(address_string) {
-    if (address_string.length === 0) return null;
+    if (!address_string || address_string.length === 0) return null;
     const clean_address = address_string.replace(/^0x/i, "").toLowerCase();
 
     if (clean_address.length !== 40) {
@@ -73,7 +73,7 @@ export function ethToVlx(address_string) {
 }
 
 export function vlxToEth(address_string) {
-    if (address_string.length === 0) return null;
+    if (!address_string || address_string.length === 0) return null;
     if(address_string.slice(0,1)!=="V") return address_string;
     const string = address_string.replace("V", "");
     const bytes = [0];
