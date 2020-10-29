@@ -241,16 +241,22 @@ export default {
     };
   },
   computed: {
-    space() {
-      return this.app.spaces[this.key||"symblox"];
+    space: {
+      get: function () {
+        const space = this.app.spaces[this.web3.network.chainId];
+        return space || {};
+      },
+      set: function (newValue) {
+        this.space = newValue;
+      }
     },
     isValid() {
       // const ts = (Date.now() / 1e3).toFixed();
       return (
         !this.loading &&
-        this.web3.account && 
-        this.name && 
-        this.targets.length > 0 && 
+        this.web3.account &&
+        this.name &&
+        this.targets.length > 0 &&
         this.targets.length === this.values.length &&
         this.targets.length === this.signatures.length &&
         this.targets.length === this.calldatas.length
@@ -270,12 +276,20 @@ export default {
   },
   watch: {
       'web3.account': async function(val, prev) {
-          if (val && val.toLowerCase() !== prev){
-              this.loading = true;
-              await this.loadData();
-              this.loading = false;
-          }
-      }
+        if (val && val.toLowerCase() !== prev){
+          this.loading = true;
+          await this.loadData();
+          this.loading = false;
+        }
+      },
+      'web3.network.chainId': async function(val, prev) {
+        if (val.toString() !== prev.toString()){
+          this.loading = true;
+          this.space = this.app.spaces[val];
+          await this.loadData();
+          this.loading = false;
+        }
+      },
   },
   methods: {
     ...mapActions(['send','getLatestProposalIds','getGovernorParams','getPower','getDelegatee','getProposalState']),
@@ -353,10 +367,17 @@ export default {
     //   }
     // },
     async handleSubmit() {
+      console.log(this.params, this.scores);
+      if(!this.params || !this.params.proposalThreshold || !this.scores){
+        this.$store.dispatch('notify', ['red', `not contract data`]);
+        return;
+      }
+
       if(this.latestProposalState === "Pending" || this.latestProposalState === "Active"){
         this.$store.dispatch('notify', ['red', `already has a active or pending proposal`]);
         return;
       }
+
       if(parseFloat(this.scores[0])<parseFloat(this.params.proposalThreshold)){
         this.$store.dispatch('notify', ['red', `proposer votes below proposal threshold, min is ${parseFloat(this.params.proposalThreshold).toFixed(2)} SYX`]);
         return;
@@ -393,6 +414,7 @@ export default {
             }
           });
         }else{
+          // this.$store.dispatch('notify', ['red', `already has a active or pending proposal`]);  
           this.loading = false;
         }
       } catch (e) {

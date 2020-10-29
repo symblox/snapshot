@@ -23,7 +23,7 @@
                         <span v-if="delegatee !== '0x0000000000000000000000000000000000000000'" v-text="_shorten(delegateeVlx)" class="hide-sm" />
                         <span v-else v-text="$t('page.setDelegatee')" class="hide-sm" />
                     </UiButton>
-                    <ModalDelegatee :open="modalOpen" @close="modalOpen = false" :space="space" :address="delegatee" />
+                    <ModalDelegatee :open="modalOpen" @close="modalOpen = false" :space="space" :address="delegatee" @loadDelegatee="loadDelegatee" />
                 </div>
                 <router-link class="new-proposal" v-if="$auth.isAuthenticated" :to="{name: 'create', params: {key}}">
                     <UiButton>{{ $t('page.newProposal') }}</UiButton>
@@ -44,7 +44,7 @@
                         <span v-if="delegatee !== '0x0000000000000000000000000000000000000000'" v-text="_shorten(delegateeVlx)" class="hide-sm" />
                         <span v-else v-text="$t('page.setDelegatee')" class="hide-sm" />
                     </UiButton>
-                    <ModalDelegatee :open="modalOpen" @close="modalOpen = false" :space="space" :address="delegatee" />
+                    <ModalDelegatee :open="modalOpen" @close="modalOpen = false" :space="space" :address="delegatee" @loadDelegatee="loadDelegatee" />
                 </div>
             </div>
         </Container>
@@ -100,9 +100,14 @@ export default {
         // key() {
         //   return this.domain || this.$route.params.key;
         // },
-        space() {
-            const space = this.app.spaces[this.key];
-            return space || {};
+        space: {
+            get: function () {
+                const space = this.app.spaces[this.web3.network.chainId];
+                return space || {};
+            },
+            set: function (newValue) {
+                this.space = newValue;
+            }
         },
         states() {
             const states = [
@@ -117,12 +122,7 @@ export default {
                 {label: this.$t('page.executed'), value: 'executed'}
             ];
 
-            // const states = ['all', 'pending', 'active', 'canceled', 'defeated', 'succeeded', 'queued', 'expired', 'executed'];
-
             return states;
-            // return this.space.filters.onlyMembers
-            //   ? states.filter(state => !['core', 'community'].includes(state))
-            //   : states;
         },
         totalProposals() {
             return Object.keys(this.proposals).length;
@@ -150,7 +150,18 @@ export default {
                 this.loading = false;
                 this.loaded = true;
             }
-        }
+        },
+        'web3.network.chainId': async function(val, prev) {
+            if (val.toString() !== prev.toString()){
+                this.loading = true;
+                this.loaded = false;
+                this.space = this.app.spaces[val];
+                await this.loadDelegatee();
+                this.proposals = await this.getProposals(this.space) || [];
+                this.loading = false;
+                this.loaded = true;
+            }
+        },
     },
     methods: {
         ...mapActions(['getProposals', 'getDelegatee','ethToVlx']),
@@ -162,7 +173,7 @@ export default {
     async created() {
         this.loading = true;
         this.selectedState = this.$route.params.tab || this.space.filters.defaultTab;
-        this.proposals = await this.getProposals(this.space);
+        this.proposals = await this.getProposals(this.space) || [];
         await this.loadDelegatee();
         this.loading = false;
         this.loaded = true;

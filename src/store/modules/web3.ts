@@ -14,11 +14,10 @@ let auth;
 //     store.commit('GET_BLOCK_SUCCESS', blockNumber);
 //   });
 // }
-
 const state = {
   account: null,
   name: null,
-  network: config.networks['1']
+  network: config.networks[config.defaultNetwork]
 };
 
 const mutations = {

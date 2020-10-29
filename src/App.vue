@@ -22,14 +22,22 @@ export default {
     this.init();
   },
   computed: {
-    space() {
-      try {
-        const key = this.domain || this.$route.params.key;
-        return this.app.spaces[key];
-      } catch (e) {
-        return {};
+    space: {
+      get: function () {
+        const space = this.app.spaces[this.web3.network.chainId];
+        return space || {};
+      },
+      set: function (newValue) {
+        this.space = newValue;
       }
     }
-  }
+  },
+  watch: {
+      'web3.network.chainId': async function(val, prev) {
+        if (val.toString() !== prev.toString()){
+          this.space = this.app.spaces[val];
+        }
+      },
+  },
 };
 </script>

@@ -160,8 +160,14 @@ export default {
         };
     },
     computed: {
-        space() {
-            return this.app.spaces[this.key];
+        space: {
+            get: function () {
+                const space = this.app.spaces[this.web3.network.chainId];
+                return space || {};
+            },
+            set: function (newValue) {
+                this.space = newValue;
+            }
         },
         payload() {
             return this.proposal.msg ? this.proposal.msg.payload : {};
@@ -186,7 +192,18 @@ export default {
                 this.loading = false;
                 this.loaded = true;
             }
-        }
+        },
+        'web3.network.chainId': async function(val, prev) {
+            if (val.toString() !== prev.toString()){
+                this.loading = true;
+                this.loaded = false;
+                this.space = this.app.spaces[val];
+                await this.loadPower();
+                await this.loadProposal();
+                this.loading = false;
+                this.loaded = true;
+            }
+        },
     },
     methods: {
         ...mapActions(['getProposal', 'getPower', 'send', 'getReceipt','getDelegatee']),
