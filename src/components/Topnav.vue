@@ -1,106 +1,91 @@
 <template>
-  <Sticky class="mb-4">
-    <nav id="topnav" class="border-bottom width-full bg-black">
-      <Container>
-        <div class="d-flex flex-items-center" style="height: 78px;">
-          <div class="flex-auto d-flex flex-items-center">
-            <router-link
-              :to="{ name: 'home' }"
-              class="d-inline-block d-flex flex-items-center"
-              style="font-size: 24px; padding-top: 4px;"
-            >
-              <span
-                :class="namespace && 'hide-sm'"
-                class="mr-1"
-                v-text="'snapshot'"
-              />
-              <template v-if="namespace">
-                <span class="pl-1 pr-2 text-gray" v-text="'/'" />
-                <Token :address="namespace.image" size="28" />
-                <span class="ml-2" v-text="namespace.symbol" />
-              </template>
-            </router-link>
-          </div>
-          <div :key="web3.account">
-            <template v-if="web3.account && !wrongNetwork">
-              <UiButton
-                @click="modalOpen = true"
-                class="button-outline"
-                :loading="loading"
-              >
-                <Avatar :address="web3.account" size="16" class="mr-2 ml-n1" />
-                <span v-if="web3.name" v-text="web3.name" />
-                <span v-else v-text="_shorten(web3.account)" />
-              </UiButton>
-            </template>
-            <UiButton
-              v-if="web3.injectedLoaded && wrongNetwork"
-              class="text-red"
-            >
-              <Icon name="warning" class="ml-n1 mr-1 v-align-middle" />
-              Wrong network
-            </UiButton>
-            <UiButton
-              v-if="showLogin"
-              @click="modalOpen = true"
-              :loading="loading"
-            >
-              Connect wallet
-            </UiButton>
-            <UiButton @click="modalAboutOpen = true" class="ml-2">
-              <span v-text="'?'" class="ml-n1 mr-n1" />
-            </UiButton>
-          </div>
+    <Sticky class="mb-4">
+        <div v-if="config.env === 'develop'" class="p-3 text-center bg-blue" style="color: white; font-size: 20px;">
+            This is the demo site, give it a try!
         </div>
-        <ModalAccount
-          :open="modalOpen"
-          @close="modalOpen = false"
-          @login="handleLogin"
-        />
-        <ModalAbout :open="modalAboutOpen" @close="modalAboutOpen = false" />
-      </Container>
-    </nav>
-  </Sticky>
+        <nav id="topnav" class="border-bottom width-full bg-black">
+            <Container>
+                <div class="d-flex flex-items-center" style="height: 78px;">
+                    <div class="flex-auto d-flex flex-items-center">
+                        <router-link
+                            :to="{name: 'proposals'}"
+                            class="d-inline-block d-flex flex-items-center"
+                            style="font-size: 24px; padding-top: 4px;"
+                        >
+                            <span :class="space && 'hide-sm'" class="mr-1" v-text="'symblox'" />
+                            <span v-if="space" class="pl-1 pr-2 text-gray" v-text="'/'" />
+                        </router-link>
+                        <router-link
+                            v-if="space"
+                            :to="{name: 'proposals'}"
+                            class="d-inline-block d-flex flex-items-center"
+                            style="font-size: 24px; padding-top: 4px;"
+                        >
+                            <Token :space="space.key" symbolIndex="space" size="28" />
+                            <span class="ml-2" v-text="space.name" />
+                        </router-link>
+                    </div>
+                    <div :key="web3.account">
+                        <template v-if="$auth.isAuthenticated">
+                            <UiButton @click="modalOpen = true" class="button-outline" :loading="loading">
+                                <Avatar :address="web3.account" size="16" class="mr-0 mr-sm-2 mr-md-2 mr-lg-2 mr-xl-2 ml-n1" />
+                                <span v-if="web3.name" v-text="web3.name" class="hide-sm" />
+                                <span v-else v-text="_shorten(addressVlx)" class="hide-sm" />
+                            </UiButton>
+                        </template>
+                        <UiButton v-if="!$auth.isAuthenticated" @click="modalOpen = true" :loading="loading">
+                            <span class="hide-sm" v-text="$t('page.connectWallet')" />
+                            <Icon name="login" size="20" class="hide-md hide-lg hide-xl ml-n2 mr-n2 v-align-text-bottom" />
+                        </UiButton>
+                        <UiButton @click="modalAboutOpen = true" class="ml-2">
+                            <span v-text="'?'" class="ml-n1 mr-n1" />
+                        </UiButton>
+                    </div>
+                    <ModalLanguage></ModalLanguage>
+                </div>
+                <ModalAccount :open="modalOpen" @close="modalOpen = false" @login="handleLogin" />
+                <ModalAbout :open="modalAboutOpen" @close="modalAboutOpen = false" />
+            </Container>
+        </nav>
+    </Sticky>
 </template>
 
 <script>
-import { mapActions } from 'vuex';
-import namespaces from '@/namespaces.json';
+import {mapActions} from 'vuex';
 
 export default {
-  data() {
-    return {
-      loading: false,
-      modalOpen: false,
-      modalAboutOpen: false
-    };
-  },
-  computed: {
-    wrongNetwork() {
-      return this.config.chainId !== this.web3.injectedChainId;
+    data() {
+        return {
+            loading: false,
+            modalOpen: false,
+            modalAboutOpen: false,
+            addressVlx: ''
+        };
     },
-    showLogin() {
-      return (
-        (!this.web3.account && !this.web3.injectedLoaded) ||
-        (!this.web3.account && !this.wrongNetwork)
-      );
+    computed: {
+        space() {
+            const key = this.domain || this.$route.params.key;
+            return this.app.spaces[key] ? this.app.spaces[key] : false;
+        }
     },
-    namespace() {
-      try {
-        return namespaces[this.$route.params.key];
-      } catch (e) {
-        return {};
-      }
+    async mounted() {
+        this.addressVlx = await this.ethToVlx(this.web3.account);
+    },
+    watch: {
+        'web3.account': async function(val, prev) {
+            if (val && val.toLowerCase() !== prev){
+                this.addressVlx = await this.ethToVlx(val);
+            }
+        }
+    },
+    methods: {
+        ...mapActions(['login','ethToVlx']),
+        async handleLogin(connector) {
+            this.modalOpen = false;
+            this.loading = true;
+            await this.login(connector);
+            this.loading = false;
+        }
     }
-  },
-  methods: {
-    ...mapActions(['login']),
-    async handleLogin(connector) {
-      this.modalOpen = false;
-      this.loading = true;
-      await this.login(connector);
-      this.loading = false;
-    }
-  }
 };
 </script>

@@ -2,12 +2,16 @@
   <UiModal :open="open" @close="$emit('close')">
     <div class="m-4 mb-0 text-center">
       <Avatar :address="address" size="64" class="mb-4" />
-      <h3 v-text="_shorten(address)" />
+      <h3 v-text="_shorten(addressVlx)" />
     </div>
     <div class="m-4">
-      <a :href="_etherscanLink(address)" target="_blank" class="mb-2 d-block">
+      <a
+        :href="_explorer(space.network, addressVlx)"
+        target="_blank"
+        class="mb-2 d-block"
+      >
         <UiButton class="button-outline width-full">
-          See on Etherscan
+          See on explorer
           <Icon name="external-link" class="ml-1" />
         </UiButton>
       </a>
@@ -16,7 +20,19 @@
 </template>
 
 <script>
+import {mapActions} from 'vuex';
 export default {
-  props: ['open', 'address']
+  data() {
+      return {
+          addressVlx: ''
+      };
+  },
+  props: ['open', 'address', 'space'],
+  async mounted() {
+      this.addressVlx = await this.ethToVlx(this.address);
+  },
+  methods: {
+        ...mapActions(['ethToVlx'])     
+  }
 };
 </script>

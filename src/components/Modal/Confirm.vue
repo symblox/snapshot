@@ -12,20 +12,32 @@
           <span v-text="'Option'" class="flex-auto text-gray mr-1" />
           {{ proposal.msg.payload.choices[selectedChoice - 1] }}
         </div>
-        <div class="d-flex">
+        <!-- <div class="d-flex">
           <span v-text="'Snapshot'" class="flex-auto text-gray mr-1" />
           <a
-            :href="_etherscanLink(proposal.msg.payload.snapshot, 'block')"
+            :href="
+              _explorer(space.network, proposal.msg.payload.snapshot, 'block')
+            "
             target="_blank"
             class="float-right"
           >
             {{ $n(proposal.msg.payload.snapshot) }}
             <Icon name="external-link" class="ml-1" />
           </a>
-        </div>
+        </div> -->
         <div class="d-flex">
-          <span v-text="'Voting power'" class="flex-auto text-gray mr-1" />
-          <span v-text="`${_numeral(power.total)} ${namespace.symbol}`" />
+          <span v-text="'Your voting power'" class="flex-auto text-gray mr-1" />
+           <span>
+            {{ _numeral(totalScore) }}
+            SYX
+           
+          </span>
+          <!-- <span v-for="(symbol, i) of symbols" :key="symbol">
+            {{ _numeral(scores[i]) }}
+          
+            {{ symbol }}
+            <span v-show="i !== symbols.length - 1" v-text="'+'" class="mr-1" />
+          </span> -->
         </div>
       </div>
       <div class="p-4 overflow-hidden text-center border-top">
@@ -51,39 +63,44 @@
 
 <script>
 import { mapActions } from 'vuex';
-import namespaces from '@/namespaces.json';
 
 export default {
   props: [
     'open',
-    'namespace',
+    'space',
     'proposal',
     'id',
     'selectedChoice',
-    'snapshot',
-    'power'
+    'delegatee',
+    'totalScore',
+    'scores'
   ],
   data() {
     return {
-      loading: false,
-      namespaces
+      loading: false
     };
   },
   computed: {
-    symbol() {
-      return this.namespace.symbol || this._shorten(this.namespace.address);
+    symbols() {
+      return this.space.strategies.map(strategy => strategy.params.symbol);
     }
   },
   methods: {
     ...mapActions(['send']),
     async handleSubmit() {
+      if(parseFloat(this.totalScore)<=0 || this.delegatee !== this.web3.account){
+        this.$store.dispatch('notify', ['red', `your votes is zero or delegatee is not you self`]);
+        return;
+      }
+      
       this.loading = true;
       await this.send({
-        token: this.namespace.address,
-        type: 'vote',
+        type: 'proposal',
         payload: {
-          proposal: this.id,
-          choice: this.selectedChoice
+          contractType: "Governor",
+          contractAddress: this.space.governor,
+          action: "castVote",
+          args: [this.id, this.selectedChoice === 1?true:false]
         }
       });
       this.$emit('reload');

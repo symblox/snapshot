@@ -1,43 +1,43 @@
 <template>
   <span>
-    <a @click="modalOpen = true" target="_blank">
+    <a @click="modalOpen = true" class="no-wrap">
       <Avatar :address="address" size="16" class="mr-1" />
       {{ name }}
-      <Icon v-if="isVerified" name="check" class="ml-1" title="Verified" />
+      <Badges :address="address" :space="space" />
     </a>
     <ModalUser
       :open="modalOpen"
       @close="modalOpen = false"
+      :space="space"
       :address="address"
     />
   </span>
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+
 export default {
-  props: {
-    address: String,
-    verified: Array
-  },
+  props: ['address', 'space'],
   data() {
     return {
-      modalOpen: false
+      modalOpen: false,
+      vlxAddress: ''
     };
+  },
+  async mounted() {
+      this.vlxAddress = await this.ethToVlx(this.address);
   },
   computed: {
     name() {
       return this.web3.account &&
         this.address.toLowerCase() === this.web3.account.toLowerCase()
         ? 'You'
-        : this._shorten(this.address);
-    },
-    isVerified() {
-      return (
-        Array.isArray(this.verified) &&
-        this.verified.length > 0 &&
-        this.verified.includes(this.address)
-      );
+        : this._shorten(this.vlxAddress);
     }
+  },
+  methods: {
+    ...mapActions(['ethToVlx'])
   }
 };
 </script>
