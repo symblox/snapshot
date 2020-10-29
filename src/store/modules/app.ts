@@ -394,7 +394,7 @@ const actions = {
             const provider = getProvider(space.network);
             const contract = await getContract(space.token, 'SYX', provider);
             if(!blockNumber){
-              blockNumber = await getBlockNumber(getProvider(space.network));
+              blockNumber = await getBlockNumber(getProvider(space.network)) - 1;
             }
             const balance = await contract.getPriorVotes(address, blockNumber);
             

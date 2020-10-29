@@ -248,9 +248,9 @@ export default {
       // const ts = (Date.now() / 1e3).toFixed();
       return (
         !this.loading &&
-        this.web3.account && 
-        this.name && 
-        this.targets.length > 0 && 
+        this.web3.account &&
+        this.name &&
+        this.targets.length > 0 &&
         this.targets.length === this.values.length &&
         this.targets.length === this.signatures.length &&
         this.targets.length === this.calldatas.length
@@ -361,10 +361,16 @@ export default {
     //   }
     // },
     async handleSubmit() {
+      if(!this.params || !this.params.proposalThreshold || !this.scores){
+        this.$store.dispatch('notify', ['red', `not contract data`]);
+        return;
+      }
+
       if(this.latestProposalState === "Pending" || this.latestProposalState === "Active"){
         this.$store.dispatch('notify', ['red', `already has a active or pending proposal`]);
         return;
       }
+
       if(parseFloat(this.scores[0])<parseFloat(this.params.proposalThreshold)){
         this.$store.dispatch('notify', ['red', `proposer votes below proposal threshold, min is ${parseFloat(this.params.proposalThreshold).toFixed(2)} SYX`]);
         return;
@@ -401,6 +407,7 @@ export default {
             }
           });
         }else{
+          // this.$store.dispatch('notify', ['red', `already has a active or pending proposal`]);  
           this.loading = false;
         }
       } catch (e) {
