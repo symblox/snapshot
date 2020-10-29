@@ -22,22 +22,10 @@ export default {
     this.init();
   },
   computed: {
-    space: {
-      get: function () {
-        const space = this.app.spaces[this.web3.network.chainId];
-        return space || {};
-      },
-      set: function (newValue) {
-        this.space = newValue;
-      }
+    space() {
+      const space = this.app.spaces[this.web3.network.chainId];
+      return space || {};
     }
-  },
-  watch: {
-      'web3.network.chainId': async function(val, prev) {
-        if (val.toString() !== prev.toString()){
-          this.space = this.app.spaces[val];
-        }
-      },
-  },
+  }
 };
 </script>

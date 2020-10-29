@@ -241,14 +241,9 @@ export default {
     };
   },
   computed: {
-    space: {
-      get: function () {
-        const space = this.app.spaces[this.web3.network.chainId];
-        return space || {};
-      },
-      set: function (newValue) {
-        this.space = newValue;
-      }
+    space() {
+      const space = this.app.spaces[this.web3.network.chainId];
+      return space || {};
     },
     isValid() {
       // const ts = (Date.now() / 1e3).toFixed();
@@ -285,7 +280,6 @@ export default {
       'web3.network.chainId': async function(val, prev) {
         if (val.toString() !== prev.toString()){
           this.loading = true;
-          this.space = this.app.spaces[val];
           await this.loadData();
           this.loading = false;
         }

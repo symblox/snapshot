@@ -100,14 +100,9 @@ export default {
         // key() {
         //   return this.domain || this.$route.params.key;
         // },
-        space: {
-            get: function () {
-                const space = this.app.spaces[this.web3.network.chainId];
-                return space || {};
-            },
-            set: function (newValue) {
-                this.space = newValue;
-            }
+        space() {
+            const space = this.app.spaces[this.web3.network.chainId];
+            return space || {};
         },
         states() {
             const states = [
@@ -155,7 +150,6 @@ export default {
             if (val.toString() !== prev.toString()){
                 this.loading = true;
                 this.loaded = false;
-                this.space = this.app.spaces[val];
                 await this.loadDelegatee();
                 this.proposals = await this.getProposals(this.space) || [];
                 this.loading = false;
