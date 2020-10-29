@@ -71,6 +71,13 @@ export default {
     async mounted() {
         this.addressVlx = await this.ethToVlx(this.web3.account);
     },
+    watch: {
+        'web3.account': async function(val, prev) {
+            if (val && val.toLowerCase() !== prev){
+                this.addressVlx = await this.ethToVlx(val);
+            }
+        }
+    },
     methods: {
         ...mapActions(['login','ethToVlx']),
         async handleLogin(connector) {
