@@ -70,7 +70,12 @@ export default {
   watch: {
     open() {
       this.step = null;
-    }
+    },
+    'web3.account': async function(val, prev) {
+        if (val && val.toLowerCase() !== prev){
+            this.addressVlx = await this.ethToVlx(this.web3.account);
+        }
+    },
   },
   async mounted() {
       this.addressVlx = await this.ethToVlx(this.web3.account);

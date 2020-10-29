@@ -246,7 +246,7 @@ const actions = {
             const curTimestamp = await getBlockTimestamp(provider, curBlockNumber);
 
             const proposalCreatedFilter = contract.filters.ProposalCreated();
-            proposalCreatedFilter['fromBlock'] = 0;
+            proposalCreatedFilter['fromBlock'] = 1450000;
 
             const proposalCreatedLogs = await provider.getLogs(proposalCreatedFilter);
 
