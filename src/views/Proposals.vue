@@ -101,7 +101,7 @@ export default {
         //   return this.domain || this.$route.params.key;
         // },
         space() {
-            const space = this.app.spaces[this.key];
+            const space = this.app.spaces[this.web3.network.chainId];
             return space || {};
         },
         states() {
@@ -117,12 +117,7 @@ export default {
                 {label: this.$t('page.executed'), value: 'executed'}
             ];
 
-            // const states = ['all', 'pending', 'active', 'canceled', 'defeated', 'succeeded', 'queued', 'expired', 'executed'];
-
             return states;
-            // return this.space.filters.onlyMembers
-            //   ? states.filter(state => !['core', 'community'].includes(state))
-            //   : states;
         },
         totalProposals() {
             return Object.keys(this.proposals).length;
@@ -150,7 +145,18 @@ export default {
                 this.loading = false;
                 this.loaded = true;
             }
-        }
+        },
+        'web3.network.chainId': async function(val, prev) {
+            if (val.toString() !== prev.toString()){
+                this.loading = true;
+                this.loaded = false;
+                this.space = this.app.spaces[val];
+                await this.loadDelegatee();
+                this.proposals = await this.getProposals(this.space) || [];
+                this.loading = false;
+                this.loaded = true;
+            }
+        },
     },
     methods: {
         ...mapActions(['getProposals', 'getDelegatee','ethToVlx']),
@@ -162,7 +168,7 @@ export default {
     async created() {
         this.loading = true;
         this.selectedState = this.$route.params.tab || this.space.filters.defaultTab;
-        this.proposals = await this.getProposals(this.space);
+        this.proposals = await this.getProposals(this.space) || [];
         await this.loadDelegatee();
         this.loading = false;
         this.loaded = true;

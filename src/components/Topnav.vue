@@ -64,8 +64,9 @@ export default {
     },
     computed: {
         space() {
-            const key = this.domain || this.$route.params.key;
-            return this.app.spaces[key] ? this.app.spaces[key] : false;
+            // const key = this.domain || this.$route.params.key;
+            // return this.app.spaces[key] ? this.app.spaces[key] : false;
+            return this.app.spaces[this.web3.network.chainId];
         }
     },
     async mounted() {
@@ -76,7 +77,12 @@ export default {
             if (val && val.toLowerCase() !== prev){
                 this.addressVlx = await this.ethToVlx(val);
             }
-        }
+        },
+        'web3.network.chainId': async function(val, prev) {
+            if (val.toString() !== prev.toString()){
+                this.space = this.app.spaces[val];
+            }
+        },
     },
     methods: {
         ...mapActions(['login','ethToVlx']),

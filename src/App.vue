@@ -24,12 +24,19 @@ export default {
   computed: {
     space() {
       try {
-        const key = this.domain || this.$route.params.key;
-        return this.app.spaces[key];
+        //const key = this.domain || this.$route.params.key;
+        return this.app.spaces[this.web3.network.chainId];
       } catch (e) {
         return {};
       }
     }
-  }
+  },
+  watch: {
+      'web3.network.chainId': async function(val, prev) {
+        if (val.toString() !== prev.toString()){
+          this.space = this.app.spaces[val];
+        }
+      },
+  },
 };
 </script>

@@ -242,7 +242,7 @@ export default {
   },
   computed: {
     space() {
-      return this.app.spaces[this.key||"symblox"];
+      return this.app.spaces[this.web3.network.chainId];
     },
     isValid() {
       // const ts = (Date.now() / 1e3).toFixed();
@@ -270,12 +270,20 @@ export default {
   },
   watch: {
       'web3.account': async function(val, prev) {
-          if (val && val.toLowerCase() !== prev){
-              this.loading = true;
-              await this.loadData();
-              this.loading = false;
-          }
-      }
+        if (val && val.toLowerCase() !== prev){
+          this.loading = true;
+          await this.loadData();
+          this.loading = false;
+        }
+      },
+      'web3.network.chainId': async function(val, prev) {
+        if (val.toString() !== prev.toString()){
+          this.loading = true;
+          this.space = this.app.spaces[val];
+          await this.loadData();
+          this.loading = false;
+        }
+      },
   },
   methods: {
     ...mapActions(['send','getLatestProposalIds','getGovernorParams','getPower','getDelegatee','getProposalState']),
