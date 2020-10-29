@@ -1,10 +1,12 @@
 {
   "injected": {
-    "id": "velas-icon.57x57",
+    "id": "injected",
+    "icon": "velas-icon.57x57",
     "name": "VELAS"
   },
   "injected2": {
-    "id": "metamask",
+    "id": "injected",
+    "icon": "metamask",
     "name": "MetaMask"
   }
 }

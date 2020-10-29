@@ -13,7 +13,7 @@
           <UiButton class="button-outline width-full v-align-middle">
             <img
               :src="
-                `https://symblox.io/${connector.id}.png`
+                `https://symblox.io/${connector.icon}.png`
               "
               height="28"
               width="28"
