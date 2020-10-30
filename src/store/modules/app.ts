@@ -142,7 +142,7 @@ const actions = {
             skin: 'yearn',
             symbol: 'SYX',
             token: '0xC20932B245840CA1C6F8c9c90BDb2F4E0289DE48',
-            governor: '0x4B42619E13f11DAc33918f35226B41EA481Ad553',
+            governor: '0xce0919fe6cba74F7B8A5E3e09c256772f76ee1fe',
             logsFromBlock: 1450000,
             members: [],
             strategies: []
