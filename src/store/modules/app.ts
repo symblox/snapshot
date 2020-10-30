@@ -143,6 +143,7 @@ const actions = {
             symbol: 'SYX',
             token: '0xC20932B245840CA1C6F8c9c90BDb2F4E0289DE48',
             governor: '0xFFcE69Af5A5e9f4B53F0A37A3c6bb2923B89996c',
+            logsFromBlock: 1450000,
             members: [],
             strategies: []
         };
@@ -154,6 +155,7 @@ const actions = {
             symbol: 'SYX',
             token: '0x2de7063fe77aAFB5b401d65E5A108649Ec577170',
             governor: '',
+            logsFromBlock: 0,
             members: [],
             strategies: []
         };
@@ -246,7 +248,8 @@ const actions = {
             const curTimestamp = await getBlockTimestamp(provider, curBlockNumber);
 
             const proposalCreatedFilter = contract.filters.ProposalCreated();
-            proposalCreatedFilter['fromBlock'] = 1450000;
+            proposalCreatedFilter['fromBlock'] = space.logsFromBlock;
+            
 
             const proposalCreatedLogs = await provider.getLogs(proposalCreatedFilter);
 
@@ -350,7 +353,7 @@ const actions = {
             };
 
             const voteCastFilter = contract.filters.VoteCast();
-            voteCastFilter['fromBlock'] = 0;
+            voteCastFilter['fromBlock'] = payload.space.logsFromBlock;
             const voteCastLogs = await provider.getLogs(voteCastFilter);
             result.votes = await Promise.all(
                 voteCastLogs.map(async log => {
