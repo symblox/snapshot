@@ -11,41 +11,9 @@
                         </h2>
                     </div>
                 </div>
-                <div class="delegatee-address-max">
-                    <span v-text="$t('page.delegatee')" class="pt-2" style="flex: 1;margin-right: 10px;"></span>
-                    <UiButton @click="modalOpen = true" class="button-outline mx-md-4" :loading="loading">
-                        <Avatar
-                            v-if="delegatee !== '0x0000000000000000000000000000000000000000'"
-                            :address="delegatee"
-                            size="16"
-                            class="mr-0 mr-sm-2 mr-md-2 mr-lg-2 mr-xl-2 ml-n1"
-                        />
-                        <span v-if="delegatee !== '0x0000000000000000000000000000000000000000'" v-text="_shorten(delegateeVlx)" class="hide-sm" />
-                        <span v-else v-text="$t('page.setDelegatee')" class="hide-sm" />
-                    </UiButton>
-                    <ModalDelegatee :open="modalOpen" @close="modalOpen = false" :space="space" :address="delegatee" @loadDelegatee="loadDelegatee" />
-                </div>
                 <router-link class="new-proposal" v-if="$auth.isAuthenticated" :to="{name: 'create', params: {key}}">
                     <UiButton>{{ $t('page.newProposal') }}</UiButton>
                 </router-link>
-            </div>
-        </Container>
-        <Container>
-            <div class="delegatee-address-min mb-3">
-                <div class="d-flex flex-items-center flex-auto">
-                    <span v-text="$t('page.delegatee')" class="mr-2"></span>
-                    <UiButton @click="modalOpen = true" class="button-outline mx-md-4" :loading="loading">
-                        <Avatar
-                            v-if="delegatee !== '0x0000000000000000000000000000000000000000'"
-                            :address="delegatee"
-                            size="16"
-                            class="mr-0 mr-sm-2 mr-md-2 mr-lg-2 mr-xl-2 ml-n1"
-                        />
-                        <span v-if="delegatee !== '0x0000000000000000000000000000000000000000'" v-text="_shorten(delegateeVlx)" class="hide-sm" />
-                        <span v-else v-text="$t('page.setDelegatee')" class="hide-sm" />
-                    </UiButton>
-                    <ModalDelegatee :open="modalOpen" @close="modalOpen = false" :space="space" :address="delegatee" @loadDelegatee="loadDelegatee" />
-                </div>
             </div>
         </Container>
         <Container :slim="true">
@@ -137,20 +105,10 @@ export default {
         }
     },
     watch: {
-        'web3.account': async function(val, prev) {
-            if (val && val.toLowerCase() !== prev){
-                this.loading = true;
-                this.loaded = false;
-                await this.loadDelegatee();
-                this.loading = false;
-                this.loaded = true;
-            }
-        },
         'web3.network.chainId': async function(val, prev) {
             if (val.toString() !== prev.toString()){
                 this.loading = true;
                 this.loaded = false;
-                await this.loadDelegatee();
                 this.proposals = await this.getProposals(this.space) || [];
                 this.loading = false;
                 this.loaded = true;
@@ -159,16 +117,11 @@ export default {
     },
     methods: {
         ...mapActions(['getProposals', 'getDelegatee','ethToVlx']),
-        async loadDelegatee() {
-            this.delegatee = await this.getDelegatee(this.space);
-            this.delegateeVlx = await this.ethToVlx(this.delegatee);
-        },
     },
     async created() {
         this.loading = true;
         this.selectedState = this.$route.params.tab || this.space.filters.defaultTab;
         this.proposals = await this.getProposals(this.space) || [];
-        await this.loadDelegatee();
         this.loading = false;
         this.loaded = true;
     }
