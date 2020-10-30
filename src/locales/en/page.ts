@@ -50,5 +50,8 @@ export default {
     confirmVoteTip2: 'This action cannot be undone.',
     cancel: 'Cancel',
     option: 'Option',
-    votingPower: 'Your voting power'
+    votingPower: 'Your voting power',
+    noDelegateeTip: 'Your have not set delegatee',
+    votesZeroTip: 'Your votes is zero',
+    delegateeNoSelfTip: 'Delegatee is not you self'
 };

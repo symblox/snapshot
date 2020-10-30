@@ -88,8 +88,18 @@ export default {
   methods: {
     ...mapActions(['send']),
     async handleSubmit() {
-      if(parseFloat(this.totalScore)<=0 || this.delegatee !== this.web3.account){
-        this.$store.dispatch('notify', ['red', `your votes is zero or delegatee is not you self`]);
+      if(this.delegatee === "0x0000000000000000000000000000000000000000"){
+        this.$store.dispatch('notify', ['red', this.$t('page.noDelegateeTip')]);
+        return;
+      }
+
+      if(parseFloat(this.totalScore)<=0){
+        this.$store.dispatch('notify', ['red', this.$t('page.votesZeroTip')]);
+        return;
+      }
+
+      if(this.delegatee !== this.web3.account){
+        this.$store.dispatch('notify', ['red', this.$t('page.delegateeNoSelfTip')]);
         return;
       }
       

@@ -50,5 +50,8 @@ export default {
     confirmVoteTip2: '此操作无法撤消。',
     cancel: '取消',
     option: '选项',
-    votingPower: '您的投票权'
+    votingPower: '您的投票权',
+    noDelegateeTip: '您尚未设置委托人',
+    votesZeroTip: '你的选票是零',
+    delegateeNoSelfTip: '委托人不是你自己'
 };

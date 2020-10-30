@@ -193,7 +193,6 @@ export default {
                 this.loading = true;
                 this.loaded = false;
                 await this.loadPower();
-                console.log(this.space)
                 await this.loadProposal();
                 this.loading = false;
                 this.loaded = true;
