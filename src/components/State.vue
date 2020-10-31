@@ -12,7 +12,6 @@ export default {
     },
     computed: {
         state() {
-            const {state} = this.proposal.msg.payload;
             const stateText = {
                 All: this.$t('page.all'),
                 Pending: this.$t('page.pending'),
@@ -24,6 +23,11 @@ export default {
                 Expired: this.$t('page.expired'),
                 Executed: this.$t('page.executed')
             };
+            if(!this.proposal.msg || !this.proposal.msg.payload){
+                return {name: stateText['All'], class: 'All'};
+            }
+            const {state} = this.proposal.msg.payload;
+            
             return {name: stateText[state], class: state};
         }
     }

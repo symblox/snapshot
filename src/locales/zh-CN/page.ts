@@ -44,5 +44,14 @@ export default {
     queue: '队列',
     execute: '执行',
     eta: 'Eta',
-    downloadReport: '下载报告'
+    downloadReport: '下载报告',
+    confirmVote: '确认投票',
+    confirmVoteTip: '您确定要投票吗',
+    confirmVoteTip2: '此操作无法撤消。',
+    cancel: '取消',
+    option: '选项',
+    votingPower: '您的投票权',
+    noDelegateeTip: '您尚未设置委托人',
+    votesZeroTip: '你的选票是零',
+    delegateeNoSelfTip: '委托人不是你自己'
 };

@@ -1,15 +1,15 @@
 <template>
   <UiModal :open="open" v-if="open" @close="$emit('close')" class="d-flex">
     <form @submit.prevent="handleSubmit" class="d-flex flex-column flex-auto">
-      <h3 class="m-4 mb-0 text-center">Confirm vote</h3>
+      <h3 class="m-4 mb-0 text-center">{{$t('page.confirmVote')}}</h3>
       <h4 class="m-4 mb-0 text-center">
-        Are you sure you want to vote "{{
+        {{$t('page.confirmVoteTip')}} "{{
           proposal.msg.payload.choices[selectedChoice - 1]
-        }}"? <br />This action <b>cannot</b> be undone.
+        }}"? {{$t('page.confirmVoteTip2')}}
       </h4>
       <div class="m-4 p-4 border rounded-2 text-white">
         <div class="d-flex">
-          <span v-text="'Option'" class="flex-auto text-gray mr-1" />
+          <span v-text="$t('page.option')" class="flex-auto text-gray mr-1" />
           {{ proposal.msg.payload.choices[selectedChoice - 1] }}
         </div>
         <!-- <div class="d-flex">
@@ -26,7 +26,7 @@
           </a>
         </div> -->
         <div class="d-flex">
-          <span v-text="'Your voting power'" class="flex-auto text-gray mr-1" />
+          <span v-text="$t('page.votingPower')" class="flex-auto text-gray mr-1" />
            <span>
             {{ _numeral(totalScore) }}
             SYX
@@ -43,7 +43,7 @@
       <div class="p-4 overflow-hidden text-center border-top">
         <div class="col-6 float-left pr-2">
           <UiButton @click="$emit('close')" type="button" class="width-full">
-            Cancel
+            {{$t('page.cancel')}}
           </UiButton>
         </div>
         <div class="col-6 float-left pl-2">
@@ -53,7 +53,7 @@
             type="submit"
             class="width-full button--submit"
           >
-            Vote
+            {{$t('page.vote')}}
           </UiButton>
         </div>
       </div>
@@ -88,8 +88,18 @@ export default {
   methods: {
     ...mapActions(['send']),
     async handleSubmit() {
-      if(parseFloat(this.totalScore)<=0 || this.delegatee !== this.web3.account){
-        this.$store.dispatch('notify', ['red', `your votes is zero or delegatee is not you self`]);
+      if(this.delegatee === "0x0000000000000000000000000000000000000000"){
+        this.$store.dispatch('notify', ['red', this.$t('page.noDelegateeTip')]);
+        return;
+      }
+
+      if(parseFloat(this.totalScore)<=0){
+        this.$store.dispatch('notify', ['red', this.$t('page.votesZeroTip')]);
+        return;
+      }
+
+      if(this.delegatee !== this.web3.account){
+        this.$store.dispatch('notify', ['red', this.$t('page.delegateeNoSelfTip')]);
         return;
       }
       

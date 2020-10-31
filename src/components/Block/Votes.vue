@@ -13,6 +13,7 @@
     >
       <User :address="vote ? vote.address : {}" :space="space" class="column" />
       <div
+        v-if="proposal.msg&&proposal.msg.payload"
         v-text="
           proposal.msg.payload.choices[vote.msg.payload.choice - 1]
         "

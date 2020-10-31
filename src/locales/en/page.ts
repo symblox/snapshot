@@ -44,5 +44,14 @@ export default {
     queue: 'Queue',
     execute: 'Execute',
     eta: 'Eta',
-    downloadReport: 'Download report'
+    downloadReport: 'Download report',
+    confirmVote: 'Confirm vote',
+    confirmVoteTip: 'Are you sure you want to vote',
+    confirmVoteTip2: 'This action cannot be undone.',
+    cancel: 'Cancel',
+    option: 'Option',
+    votingPower: 'Your voting power',
+    noDelegateeTip: 'Your have not set delegatee',
+    votesZeroTip: 'Your votes is zero',
+    delegateeNoSelfTip: 'Delegatee is not you self'
 };

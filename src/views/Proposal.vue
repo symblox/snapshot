@@ -160,14 +160,9 @@ export default {
         };
     },
     computed: {
-        space: {
-            get: function () {
-                const space = this.app.spaces[this.web3.network.chainId];
-                return space || {};
-            },
-            set: function (newValue) {
-                this.space = newValue;
-            }
+        space() {
+            const space = this.app.spaces[this.web3.network.chainId];
+            return space || {};
         },
         payload() {
             return this.proposal.msg ? this.proposal.msg.payload : {};
@@ -197,7 +192,6 @@ export default {
             if (val.toString() !== prev.toString()){
                 this.loading = true;
                 this.loaded = false;
-                this.space = this.app.spaces[val];
                 await this.loadPower();
                 await this.loadProposal();
                 this.loading = false;
@@ -208,21 +202,25 @@ export default {
     methods: {
         ...mapActions(['getProposal', 'getPower', 'send', 'getReceipt','getDelegatee']),
         async loadProposal() {
-            this.name = "fff";
             const proposalObj = await this.getProposal({
                 space: this.space,
-                id: this.id,
-                name: this.name
+                id: this.id
             });
             this.receipt = await this.getReceipt({
                 space: this.space,
-                id: this.id,
-                name: this.name
+                id: this.id
             });
-            this.proposal = proposalObj.proposal;
-            this.votes = proposalObj.votes;
-            this.results = proposalObj.results;
-            this.hasVoted = proposalObj.hasVoted;
+            if(proposalObj){
+                this.proposal = proposalObj.proposal;
+                this.votes = proposalObj.votes;
+                this.results = proposalObj.results;
+                this.hasVoted = proposalObj.hasVoted;
+            }else{
+                this.proposal = {};
+                this.votes = {};
+                this.results = [];
+                this.hasVoted = false;
+            }
         },
         async loadPower() {
             if (!this.web3.account) return;

@@ -61,14 +61,14 @@
     "explorer": "https://blockscout.com/poa/xdai"
   },
   "106": {
-    "name": "VLX",
+    "name": "VELAS",
     "chainId": 106,
-    "network": "Mainnet",
+    "network": "mainnet",
     "rpcUrl": "https://explorer.velas.com/rpc",
     "explorer": "https://explorer.velas.com"
   },
   "111": {
-    "name": "VLX testnet",
+    "name": "VELAS (Test)",
     "chainId": 111,
     "network": "testnet",
     "rpcUrl": "https://explorer.testnet.veladev.net/rpc",
