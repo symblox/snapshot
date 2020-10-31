@@ -37,7 +37,7 @@
             >
               <Token
                 :space="space.key"
-                symbolIndex="space"
+                symbolIndex="symblox"
                 size="98"
                 class="my-3"
               />

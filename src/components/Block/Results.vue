@@ -1,11 +1,11 @@
 <template>
-  <Block :title="ts >= payload.end ? $t('page.results') : $t('page.currentResults')">
+  <Block
+    :title="ts >= payload.end ? $t('page.results') : $t('page.currentResults')"
+  >
     <div v-for="(choice, i) in payload.choices" :key="i">
       <div class="text-white mb-1">
         <span v-text="_shorten(choice, 'choice')" class="mr-1" />
-        <span
-          class="mr-1 "
-        >
+        <span class="mr-1 ">
           {{ _numeral(results.totalBalances[i]) }}
           {{ _shorten(space.symbol, 'symbol') }}
         </span>
@@ -31,40 +31,30 @@
       />
     </div>
     <div v-if="ts >= payload.end">
-      <!-- <UiButton
-        v-if="
-          _get(payload, 'metadata.plugins.aragon') &&
-            _get(space, 'plugins.aragon')
-        "
-        @click="submitOnChain"
-        :loading="loading"
-        class="width-full mt-2 button--submit"
+      <UiButton
+        v-if="payload.state === 'Succeeded'"
+        @click="queue"
+        class="d-block width-full button--submit"
       >
-        <img
-          class="mr-1 circle v-align-middle"
-          src="https://raw.githubusercontent.com/balancer-labs/snapshot/develop/src/assets/aragon.svg"
-          width="26"
-          height="26"
-          style="margin-top: -4px;"
-        />
-        Submit on-chain
-      </UiButton> -->
-      <UiButton v-if="payload.state === 'Succeeded'" @click="queue" class="d-block width-full button--submit">
-        {{$t('page.queue')}}
+        {{ $t('page.queue') }}
       </UiButton>
       <div v-if="payload.state === 'Queued'" class="mb-1">
-        <b>{{$t('page.eta')}}</b>
+        <b>{{ $t('page.eta') }}</b>
         <span
-            :aria-label="_ms(payload.eta)"
-            v-text="$d(payload.eta * 1e3, 'short')"
-            class="float-right text-white tooltipped tooltipped-n"
+          :aria-label="_ms(payload.eta)"
+          v-text="$d(payload.eta * 1e3, 'short')"
+          class="float-right text-white tooltipped tooltipped-n"
         />
       </div>
-      <UiButton v-if="payload.state === 'Queued'" @click="execute" class="d-block width-full button--submit">
-        {{$t('page.execute')}}
+      <UiButton
+        v-if="payload.state === 'Queued'"
+        @click="execute"
+        class="d-block width-full button--submit"
+      >
+        {{ $t('page.execute') }}
       </UiButton>
-      <UiButton  @click="downloadReport" class="width-full mt-2">
-        {{$t('page.downloadReport')}}
+      <UiButton @click="downloadReport" class="width-full mt-2">
+        {{ $t('page.downloadReport') }}
       </UiButton>
     </div>
   </Block>
@@ -104,47 +94,47 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['notify','send']),
+    ...mapActions(['notify', 'send']),
     async queue() {
-        try {
-            const result = await this.send({
-                type: 'queue',
-                payload: {
-                    contractType: 'Governor',
-                    contractAddress: this.space.governor,
-                    action: 'queue',
-                    args: [this.id]
-                }
-            });
-            this.loading = false;
-        } catch (e) {
-            console.error(e);
-            this.loading = false;
-        }
+      try {
+        const result = await this.send({
+          type: 'queue',
+          payload: {
+            contractType: 'Governor',
+            contractAddress: this.space.governor,
+            action: 'queue',
+            args: [this.id]
+          }
+        });
+        this.loading = false;
+      } catch (e) {
+        console.error(e);
+        this.loading = false;
+      }
     },
     async execute() {
-        try {
-            const result = await this.send({
-                type: 'queue',
-                payload: {
-                    contractType: 'Governor',
-                    contractAddress: this.space.governor,
-                    action: 'execute',
-                    args: [this.id]
-                }
-            });
-            this.loading = false;
-        } catch (e) {
-            console.error(e);
-            this.loading = false;
-        }
+      try {
+        const result = await this.send({
+          type: 'queue',
+          payload: {
+            contractType: 'Governor',
+            contractAddress: this.space.governor,
+            action: 'execute',
+            args: [this.id]
+          }
+        });
+        this.loading = false;
+      } catch (e) {
+        console.error(e);
+        this.loading = false;
+      }
     },
     async downloadReport() {
       const obj = Object.entries(this.votes)
         .map(vote => {
           return {
             address: vote[1].address,
-            choice: vote[1].msg.payload.choice === 1?true:false,
+            choice: vote[1].msg.payload.choice === 1 ? true : false,
             balance: vote[1].balance
           };
         })
@@ -160,35 +150,35 @@ export default {
       } catch (e) {
         console.error(e);
       }
-    },
-//     async submitOnChain() {
-//       if (!this.space.plugins || !this.space.plugins.aragon) return;
-//       this.loading = true;
-//       const aragon = new plugins.Aragon();
-//       const callsScript = aragon.execute(
-//         this.space.plugins.aragon,
-//         this.payload.metadata.plugins.aragon[`choice${this.winningChoice}`]
-//       );
-//       console.log(
-//         `Submit on-chain
-// Proposal #${this.id} on-chain
-// Option: ${this.winningChoice}
-// Callsscript: ${callsScript}`
-//       );
-//       try {
-//         const tx = await sendTransaction(this.$auth.web3, [
-//           'DisputableDelay',
-//           this.space.plugins.aragon.disputableDelayAddress,
-//           'delayExecution',
-//           [callsScript, this.id]
-//         ]);
-//         console.log(tx);
-//       } catch (e) {
-//         console.error(e);
-//       }
-//       this.notify(['green', `The settlement is on-chain, congrats!`]);
-//       this.loading = false;
-//     }
+    }
+    //     async submitOnChain() {
+    //       if (!this.space.plugins || !this.space.plugins.aragon) return;
+    //       this.loading = true;
+    //       const aragon = new plugins.Aragon();
+    //       const callsScript = aragon.execute(
+    //         this.space.plugins.aragon,
+    //         this.payload.metadata.plugins.aragon[`choice${this.winningChoice}`]
+    //       );
+    //       console.log(
+    //         `Submit on-chain
+    // Proposal #${this.id} on-chain
+    // Option: ${this.winningChoice}
+    // Callsscript: ${callsScript}`
+    //       );
+    //       try {
+    //         const tx = await sendTransaction(this.$auth.web3, [
+    //           'DisputableDelay',
+    //           this.space.plugins.aragon.disputableDelayAddress,
+    //           'delayExecution',
+    //           [callsScript, this.id]
+    //         ]);
+    //         console.log(tx);
+    //       } catch (e) {
+    //         console.error(e);
+    //       }
+    //       this.notify(['green', `The settlement is on-chain, congrats!`]);
+    //       this.loading = false;
+    //     }
   }
 };
 </script>
