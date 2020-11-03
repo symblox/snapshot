@@ -19,7 +19,7 @@
           v-if="$auth.isAuthenticated"
           :to="{ name: 'create', params: { key } }"
         >
-          <UiButton>{{ $t('page.newProposal') }}</UiButton>
+          <UiButton style="padding: 0 12px">{{ $t('page.newProposal') }}</UiButton>
         </router-link>
       </div>
     </Container>
