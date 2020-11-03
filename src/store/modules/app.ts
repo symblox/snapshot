@@ -118,8 +118,8 @@ const actions = {
     },
     init: async ({commit, dispatch}) => {
         commit('SET', {loading: true});
-        const connector = await Vue.prototype.$auth.getConnector();
-        if (connector) await dispatch('login', connector);
+        // const connector = await Vue.prototype.$auth.getConnector();
+        // if (connector) await dispatch('login', connector);
         await dispatch('getSpaces');
         commit('SET', {loading: false, init: true});
     },

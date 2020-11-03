@@ -131,7 +131,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getProposals', 'getDelegatee', 'ethToVlx'])
+    ...mapActions(['getProposals', 'ethToVlx'])
   },
   async created() {
     this.loading = true;
