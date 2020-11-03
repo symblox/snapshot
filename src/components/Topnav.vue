@@ -11,7 +11,7 @@
       <Container>
         <div class="d-flex flex-items-center" style="height: 78px;">
           <div class="flex-auto d-flex flex-items-center">
-            <router-link
+            <!-- <router-link
               :to="{ name: 'proposals' }"
               class="d-inline-block d-flex flex-items-center"
               style="font-size: 24px; padding-top: 4px;"
@@ -22,7 +22,7 @@
                 v-text="'Voting'"
               />
               <span v-if="space" class="pl-1 pr-2 text-gray" v-text="'/'" />
-            </router-link>
+            </router-link> -->
             <router-link
               v-if="space"
               :to="{ name: 'proposals' }"
