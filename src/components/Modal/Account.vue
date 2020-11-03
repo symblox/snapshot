@@ -70,8 +70,8 @@
                 size="16"
                 class="mr-0 mr-sm-2 mr-md-2 mr-lg-2 mr-xl-2 ml-n1"
             />
-            <span v-if="delegatee && delegatee !== '0x0000000000000000000000000000000000000000'" v-text="_shorten(delegateeVlx)" class="hide-sm" />
-            <span v-else v-text="$t('page.setDelegatee')" class="hide-sm" />
+            <span v-if="delegatee && delegatee !== '0x0000000000000000000000000000000000000000'" v-text="_shorten(delegateeVlx)" />
+            <span v-else v-text="$t('page.setDelegatee')" />
         </UiButton>
         <UiButton
           @click="step = 'connect'"
