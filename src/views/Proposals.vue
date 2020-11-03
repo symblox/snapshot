@@ -5,7 +5,7 @@
         <div class="flex-auto">
           <div v-text="space.name" />
           <div class="d-flex flex-items-center flex-auto">
-            <h2 class="mr-2">
+            <h2>
               {{ $t('page.proposals') }}
               <UiCounter
                 :counter="Object.keys(proposalsWithFilter).length"
