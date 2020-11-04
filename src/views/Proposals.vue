@@ -5,7 +5,7 @@
         <div class="flex-auto">
           <div v-text="space.name" />
           <div class="d-flex flex-items-center flex-auto">
-            <h2 class="mr-2">
+            <h2>
               {{ $t('page.proposals') }}
               <UiCounter
                 :counter="Object.keys(proposalsWithFilter).length"
@@ -19,7 +19,7 @@
           v-if="$auth.isAuthenticated"
           :to="{ name: 'create', params: { key } }"
         >
-          <UiButton>{{ $t('page.newProposal') }}</UiButton>
+          <UiButton style="padding: 0 12px">{{ $t('page.newProposal') }}</UiButton>
         </router-link>
       </div>
     </Container>
@@ -131,7 +131,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getProposals', 'getDelegatee', 'ethToVlx'])
+    ...mapActions(['getProposals', 'ethToVlx'])
   },
   async created() {
     this.loading = true;
