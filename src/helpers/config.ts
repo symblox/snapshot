@@ -5,7 +5,7 @@ const config = {
   env: 'master',
   connectors,
   networks,
-  defaultNetwork: 111
+  defaultNetwork: 106
 };
 
 const domainName = window.location.hostname;
