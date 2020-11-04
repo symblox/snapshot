@@ -32,7 +32,7 @@ export default {
       const diff = number * 1e3 - new Date().getTime();
       return prettyMs(diff);
     },
-    _numeral(number, format = '(0.[00]a)') {
+    _numeral(number, format = '0,0.00') {
       return numeral(number).format(format);
     },
     _shorten(str: string, key: string): string {
