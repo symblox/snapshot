@@ -133,7 +133,7 @@ export default {
       const obj = Object.entries(this.votes)
         .map(vote => {
           return {
-            address: vote[1].address,
+            address: vote[1].addressVlx,
             choice: vote[1].msg.payload.choice === 1 ? true : false,
             balance: vote[1].balance
           };
