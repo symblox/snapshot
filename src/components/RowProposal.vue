@@ -5,7 +5,7 @@
     >
         <div>
             <State :proposal="proposal" class="d-inline-block mr-2 mb-2" />
-            <h3 v-text="_shorten(proposal.msg.payload.name, 'name')" class="d-inline-block mb-1" />
+            <h3 v-text="_shorten(proposal.msg.payload.name.split(';')[0], 'name')" class="d-inline-block mb-1" />
         </div>
         <div>
             <span v-text="`#${proposal.id}`" />

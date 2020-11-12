@@ -6,6 +6,7 @@
     >
       <slot />
       <a
+        v-if="!noIcon"
         @click="$emit('close')"
         class="position-absolute right-0 top-1 p-4 text-gray"
       >
@@ -17,7 +18,7 @@
 
 <script>
 export default {
-  props: ['open']
+  props: ['open','noIcon']
 };
 </script>
 

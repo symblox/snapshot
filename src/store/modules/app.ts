@@ -3,6 +3,7 @@ import {getInstance} from '@snapshot-labs/lock/plugins/vue';
 import {getScores} from '@snapshot-labs/snapshot.js/src/utils';
 import client from '@/helpers/client';
 import ipfs from '@/helpers/ipfs';
+import {abiEncode} from '@/helpers/content';
 import {vlxToEth, ethToVlx} from '@/helpers/vlxAddressConversion';
 import getProvider from '@/helpers/provider';
 import {formatProposal, formatProposals, formatSpace} from '@/helpers/utils';
@@ -125,6 +126,9 @@ const actions = {
     },
     loading: ({commit}, payload) => {
         commit('SET', {loading: payload});
+    },
+    encode: async ({commit}, payload) => {
+      return await abiEncode(payload.coerceFunc, payload.types, payload.values);
     },
     ethToVlx({commit}, address) {
       return ethToVlx(address);

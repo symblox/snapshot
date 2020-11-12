@@ -45,6 +45,7 @@ export default {
     execute: '执行',
     eta: 'Eta',
     downloadReport: '下载报告',
+    confirm: '确认',
     confirmVote: '确认投票',
     confirmVoteTip: '您确定要投票吗',
     confirmVoteTip2: '此操作无法撤消。',
@@ -53,5 +54,10 @@ export default {
     votingPower: '您的投票权',
     noDelegateeTip: '您尚未设置委托人',
     votesZeroTip: '你的选票是零',
-    delegateeNoSelfTip: '委托人不是你自己'
+    delegateeNoSelfTip: '委托人不是你自己',
+    addAction: '添加行动',
+    function: '方法',
+    params: '参数',
+    body: '你有什么建议？',
+    choose: '选择...'
 };
