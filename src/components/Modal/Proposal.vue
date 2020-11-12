@@ -80,7 +80,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions(['vlxToEth','encode']),
+    ...mapActions(['vlxToEth','encode','formatEther','parseEther']),
     onContract(contract,name) {
         this.activeTarget = name;
         this.targetVisible = !this.targetVisible;
@@ -104,6 +104,12 @@ export default {
         this.values.push("0");
         this.signatures.push(this.form.signature);
         let callData;
+        for(let i = 0;i<this.form.args.length;i++){
+            if(this.target[this.activeTarget].actions[this.functionKey].formats[i]==="toWei"){
+                this.form.args[i] = (await this.parseEther(this.form.args[i].toString())).toString()
+            }
+        }
+
         try {
             callData = await this.encode({
                 coerceFunc: this.form.signature,types: this.form.types,values:this.form.args

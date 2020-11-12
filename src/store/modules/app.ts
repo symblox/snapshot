@@ -3,6 +3,7 @@ import {getInstance} from '@snapshot-labs/lock/plugins/vue';
 import {getScores} from '@snapshot-labs/snapshot.js/src/utils';
 import client from '@/helpers/client';
 import ipfs from '@/helpers/ipfs';
+import {formatEther, parseEther} from '@ethersproject/units';
 import {abiEncode} from '@/helpers/content';
 import {vlxToEth, ethToVlx} from '@/helpers/vlxAddressConversion';
 import getProvider from '@/helpers/provider';
@@ -136,6 +137,12 @@ const actions = {
     vlxToEth({commit}, address) {
       return vlxToEth(address);
     },
+    formatEther: async ({commit}, amount) => {
+        return await formatEther(amount);
+    },
+    parseEther: async ({commit}, amount) => {
+        return await parseEther(amount);
+    },
     getSpaces: async ({commit}) => {
         //let spaces: any = await client.request('spaces');
         let spaces: any = {};
@@ -168,7 +175,7 @@ const actions = {
         commit('SET', {spaces});
         return spaces;
     },
-    send: async ({commit, dispatch, rootState}, {type, payload}) => {
+    send: async ({commit, dispatch}, {type, payload}) => {
         const auth = getInstance();
         commit('SEND_REQUEST');
         try {

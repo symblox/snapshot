@@ -41,7 +41,7 @@
         >
           <UiButton class="d-flex width-full mb-2" v-for="(data, i) in targets" :key="i">
             <span class="mr-4">{{ i + 1 }}</span>
-            {{data+','+signatures[i]}}
+            {{signatures[i]}}
             <span @click="removeTarget(i)" class="ml-4">
               <Icon name="close" size="12" />
             </span>
