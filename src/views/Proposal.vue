@@ -16,7 +16,7 @@
                         </h1>
                         <State :proposal="proposal" class="mb-4" />
                     
-                        {{body}}
+                        
                         <UiMarkdown :body="body" class="mb-6" />                
                     </template>
                     <PageLoading v-else />
