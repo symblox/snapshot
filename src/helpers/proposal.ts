@@ -40,7 +40,7 @@ export const TARGETS = {
             }]
         },
         connectorFactory: {
-            address: "0xE1532372F4592E4B6D4fB666F5F2027847a81A8A",
+            address: "0xff165a0eeCc3CcB0057e7a8cf7E83Af4ea4d253a",
             actions: [{
                 signature: "setConnectorImpl(uint8,address)",
                 params: ["reward pool id(number)","implementation(address)"],
