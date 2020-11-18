@@ -1,7 +1,7 @@
 <template>
     <router-link
         class="px-4 py-3 border-top d-block text-gray"
-        :to="`/symblox/proposal/${proposal.id}?name=${proposal.msg.payload.name}&key=${token}`"
+        :to="`/symblox/proposal/${proposal.id}?name=${encodeURIComponent(proposal.msg.payload.name)}&key=${token}`"
     >
         <div>
             <State :proposal="proposal" class="d-inline-block mr-2 mb-2" />

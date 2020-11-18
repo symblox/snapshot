@@ -229,11 +229,10 @@ export default {
               id
             },
             query: {
-              name: proposalName
+              name: encodeURIComponent(proposalName)
             }
           });
-        }else{
-          // this.$store.dispatch('notify', ['red', `already has a active or pending proposal`]);  
+        }else{ 
           this.loading = false;
         }
       } catch (e) {

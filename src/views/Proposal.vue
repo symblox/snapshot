@@ -170,10 +170,10 @@ export default {
             return this.proposal.msg ? this.proposal.msg.payload : {};
         },
         title () {
-            return this.$route.query.name.split(';')[0] || '';
+            return decodeURIComponent(this.$route.query.name).split(';')[0] || '';
         },
         body () {
-            return this.$route.query.name.split(';')[1] || '';
+            return decodeURIComponent(this.$route.query.name).split(';')[1] || '';
         },
         ts() {
             return (Date.now() / 1e3).toFixed();
