@@ -64,7 +64,7 @@
     "name": "VELAS",
     "chainId": 106,
     "network": "mainnet",
-    "rpcUrl": "https://rpc.symblox.net",
+    "rpcUrl": "https://explorer.velas.com/rpc",
     "explorer": "https://explorer.velas.com"
   },
   "111": {
