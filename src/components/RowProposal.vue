@@ -1,11 +1,11 @@
 <template>
     <router-link
         class="px-4 py-3 border-top d-block text-gray"
-        :to="`/symblox/proposal/${proposal.id}?name=${proposal.msg.payload.name}&key=${token}`"
+        :to="`/symblox/proposal/${proposal.id}?name=${encodeURIComponent(proposal.msg.payload.name)}&key=${token}`"
     >
         <div>
             <State :proposal="proposal" class="d-inline-block mr-2 mb-2" />
-            <h3 v-text="_shorten(proposal.msg.payload.name, 'name')" class="d-inline-block mb-1" />
+            <h3 v-text="_shorten(proposal.msg.payload.name.split(';')[0], 'name')" class="d-inline-block mb-1" />
         </div>
         <div>
             <span v-text="`#${proposal.id}`" />

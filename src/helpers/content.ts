@@ -1,8 +1,13 @@
 // https://github.com/ensdomains/ui/blob/master/src/utils/contents.js
 import contentHash from '@ensdomains/content-hash';
 import { isHexString } from '@ethersproject/bytes';
+import { AbiCoder } from '@ethersproject/abi';
 import bs58 from 'bs58';
 const supportedCodecs = ['ipns-ns', 'ipfs-ns', 'swarm-ns', 'onion', 'onion3'];
+
+export async function abiEncode(coerceFunc: any, types, values) {
+  return new AbiCoder(coerceFunc).encode(types, values);
+}
 
 export function decodeContenthash(encoded) {
   let decoded, protocolType, error;

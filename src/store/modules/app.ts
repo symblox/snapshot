@@ -3,6 +3,8 @@ import {getInstance} from '@snapshot-labs/lock/plugins/vue';
 import {getScores} from '@snapshot-labs/snapshot.js/src/utils';
 import client from '@/helpers/client';
 import ipfs from '@/helpers/ipfs';
+import {formatEther, parseEther} from '@ethersproject/units';
+import {abiEncode} from '@/helpers/content';
 import {vlxToEth, ethToVlx} from '@/helpers/vlxAddressConversion';
 import getProvider from '@/helpers/provider';
 import {formatProposal, formatProposals, formatSpace} from '@/helpers/utils';
@@ -126,11 +128,20 @@ const actions = {
     loading: ({commit}, payload) => {
         commit('SET', {loading: payload});
     },
+    encode: async ({commit}, payload) => {
+      return await abiEncode(payload.coerceFunc, payload.types, payload.values);
+    },
     ethToVlx({commit}, address) {
       return ethToVlx(address);
     },
     vlxToEth({commit}, address) {
       return vlxToEth(address);
+    },
+    formatEther: async ({commit}, amount) => {
+        return await formatEther(amount);
+    },
+    parseEther: async ({commit}, amount) => {
+        return await parseEther(amount);
     },
     getSpaces: async ({commit}) => {
         //let spaces: any = await client.request('spaces');
@@ -142,7 +153,7 @@ const actions = {
             skin: 'yearn',
             symbol: 'SYX',
             token: '0xC20932B245840CA1C6F8c9c90BDb2F4E0289DE48',
-            governor: '0xce0919fe6cba74F7B8A5E3e09c256772f76ee1fe',
+            governor: '0xbA0213618B25e4A365Abb0cbf6E849Eab312cA79',
             logsFromBlock: 1450000,
             members: [],
             strategies: []
@@ -164,7 +175,7 @@ const actions = {
         commit('SET', {spaces});
         return spaces;
     },
-    send: async ({commit, dispatch, rootState}, {type, payload}) => {
+    send: async ({commit, dispatch}, {type, payload}) => {
         const auth = getInstance();
         commit('SEND_REQUEST');
         try {

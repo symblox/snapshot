@@ -15,7 +15,9 @@
                             <span v-text="`#${id.slice(0, 7)}`" class="text-gray" />
                         </h1>
                         <State :proposal="proposal" class="mb-4" />
-                        <!-- <UiMarkdown :body="payload.body" class="mb-6" /> -->
+                    
+                        
+                        <UiMarkdown :body="body" class="mb-6" />                
                     </template>
                     <PageLoading v-else />
                 </div>
@@ -168,7 +170,10 @@ export default {
             return this.proposal.msg ? this.proposal.msg.payload : {};
         },
         title () {
-            return this.$route.query.name || '';
+            return decodeURIComponent(this.$route.query.name).split(';')[0] || '';
+        },
+        body () {
+            return decodeURIComponent(this.$route.query.name).split(';')[1] || '';
         },
         ts() {
             return (Date.now() / 1e3).toFixed();

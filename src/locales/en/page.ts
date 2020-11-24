@@ -45,6 +45,7 @@ export default {
     execute: 'Execute',
     eta: 'Eta',
     downloadReport: 'Download report',
+    confirm: 'Confirm',
     confirmVote: 'Confirm vote',
     confirmVoteTip: 'Are you sure you want to vote',
     confirmVoteTip2: 'This action cannot be undone.',
@@ -53,5 +54,10 @@ export default {
     votingPower: 'Your voting power',
     noDelegateeTip: 'Your have not set delegatee',
     votesZeroTip: 'Your votes is zero',
-    delegateeNoSelfTip: 'Delegatee is not you self'
+    delegateeNoSelfTip: 'Delegatee is not you self',
+    addAction: 'Add action',
+    function: 'Function',
+    params: 'Params',
+    body: 'What is your proposal?',
+    Choose: 'Choose...'
 };
