@@ -39,15 +39,17 @@
         </div>
         <RowLoading v-if="loading" />
         <div v-if="loaded">
-          <RowProposal
+          <div @click="lsSet(space.network+proposal.id, proposal.msg.payload.name)"
             v-for="(proposal, i) in proposalsWithFilter"
-            :key="i"
-            :proposal="proposal"
-            :space="space"
-            :token="key"
-            :verified="space.verified"
-            :i="i"
-          />
+            :key="i">
+              <RowProposal
+              :proposal="proposal"
+              :space="space"
+              :token="key"
+              :verified="space.verified"
+              :i="i"
+            />
+          </div>
         </div>
         <p
           v-if="loaded && Object.keys(proposalsWithFilter).length === 0"
@@ -62,6 +64,7 @@
 
 <script>
 import { mapActions } from 'vuex';
+import { lsGet, lsSet } from '@/helpers/utils';
 
 export default {
   data() {
@@ -131,7 +134,9 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getProposals', 'ethToVlx'])
+    ...mapActions(['getProposals', 'ethToVlx']),
+    lsGet,
+    lsSet
   },
   async created() {
     this.loading = true;

@@ -139,6 +139,7 @@
 
 <script>
 import {mapActions} from 'vuex';
+import { lsGet, lsSet } from '@/helpers/utils';
 
 export default {
     data() {
@@ -169,11 +170,11 @@ export default {
         payload() {
             return this.proposal.msg ? this.proposal.msg.payload : {};
         },
-        title () {
-            return decodeURIComponent(this.$route.query.name).split(';')[0] || '';
+        title () {     
+            return this.lsGet(this.app.spaces[this.web3.network.chainId].network+this.proposal.id).split(';')[0] || '';
         },
         body () {
-            return decodeURIComponent(this.$route.query.name).split(';')[1] || '';
+            return this.lsGet(this.app.spaces[this.web3.network.chainId].network+this.proposal.id).split(';')[1] || '';
         },
         ts() {
             return (Date.now() / 1e3).toFixed();
@@ -206,6 +207,8 @@ export default {
     },
     methods: {
         ...mapActions(['getProposal', 'getPower', 'send', 'getReceipt','getDelegatee']),
+        lsGet,
+        lsSet,
         async loadProposal() {
             const proposalObj = await this.getProposal({
                 space: this.space,
