@@ -33,6 +33,7 @@ export default {
       return prettyMs(diff);
     },
     _numeral(number, format = '0,0.00') {
+      if(parseFloat(number)<0.001)number=0;
       console.log(numeral(number), numeral(number).format(format))
       return numeral(number).format(format);
     },
