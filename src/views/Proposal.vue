@@ -229,7 +229,6 @@ export default {
                 this.results = [];
                 this.hasVoted = false;
             }
-            console.log(this.votes)
         },
         async loadPower() {
             if (!this.web3.account) return;

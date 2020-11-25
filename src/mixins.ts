@@ -33,6 +33,7 @@ export default {
       return prettyMs(diff);
     },
     _numeral(number, format = '0,0.00') {
+      console.log(numeral(number), numeral(number).format(format))
       return numeral(number).format(format);
     },
     _shorten(str: string, key: string): string {
