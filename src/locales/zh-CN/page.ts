@@ -49,6 +49,7 @@ export default {
     confirmVote: '确认投票',
     confirmVoteTip: '您确定要投票吗',
     confirmVoteTip2: '此操作无法撤消。',
+    confirmProposal: '确认提案',
     cancel: '取消',
     option: '选项',
     votingPower: '您的投票权',
