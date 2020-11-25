@@ -366,6 +366,7 @@ const actions = {
             const voteCastFilter = contract.filters.VoteCast();
             voteCastFilter['fromBlock'] = payload.space.logsFromBlock;
             const voteCastLogs = await provider.getLogs(voteCastFilter);
+            console.log(voteCastLogs)
             result.votes = await Promise.all(
                 voteCastLogs.map(async log => {
                     const logData = contract.interface.parseLog(log);
@@ -386,7 +387,9 @@ const actions = {
                     }
                 })
             );
+            console.log(result.votes)
             result.votes = result.votes.filter(res => res != undefined);
+            console.log(result.votes)
 
             const forVotes = proposal.forVotes / 10 ** 18,
                 againstVotes = proposal.againstVotes / 10 ** 18;
