@@ -95,6 +95,7 @@ import { mapActions } from 'vuex';
 // import draggable from 'vuedraggable';
 import { getBlockNumber } from '@/helpers/web3';
 import getProvider from '@/helpers/provider';
+import { lsGet, lsSet } from '@/helpers/utils';
 
 export default {
   // components: {
@@ -166,6 +167,7 @@ export default {
   },
   methods: {
     ...mapActions(['send','getLatestProposalIds','getGovernorParams','getPower','getDelegatee','getProposalState']),
+    lsGet, lsSet,
     async loadData() {
       this.params = await this.getGovernorParams(this.space);
       this.delegatee = await this.getDelegatee(this.space);
@@ -222,14 +224,12 @@ export default {
 
         if(result){
           const id = await this.getLatestProposalIds(this.space);
+          this.lsSet(this.space.network+id,proposalName);
           this.$router.push({
             name: 'proposal',
             params: {
               key: this.key,
               id
-            },
-            query: {
-              name: encodeURIComponent(proposalName)
             }
           });
         }else{ 
