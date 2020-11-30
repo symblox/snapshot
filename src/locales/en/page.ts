@@ -49,6 +49,7 @@ export default {
     confirmVote: 'Confirm vote',
     confirmVoteTip: 'Are you sure you want to vote',
     confirmVoteTip2: 'This action cannot be undone.',
+    confirmProposal: 'Confirm proposal',
     cancel: 'Cancel',
     option: 'Option',
     votingPower: 'Your voting power',

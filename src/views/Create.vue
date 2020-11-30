@@ -73,6 +73,12 @@
       :networkId="web3.network.chainId"
       @close="modalOpen = false"
     />
+    <ModalProposalConfirm
+      :form="form"
+      :open="confirmModalOpen"
+      :networkId="web3.network.chainId"
+      @close="confirmModalOpen = false"
+    />
     <!-- <ModalSelectDate
       :value="form[selectedDate]"
       :selectedDate="selectedDate"
@@ -95,7 +101,6 @@ import { mapActions } from 'vuex';
 // import draggable from 'vuedraggable';
 import { getBlockNumber } from '@/helpers/web3';
 import getProvider from '@/helpers/provider';
-import { lsGet, lsSet } from '@/helpers/utils';
 
 export default {
   // components: {
@@ -123,6 +128,7 @@ export default {
         args: [],
       },
       modalOpen: false,
+      confirmModalOpen: false,
       modalPluginsOpen: false,
       selectedDate: '',
       counter: 0
@@ -167,7 +173,6 @@ export default {
   },
   methods: {
     ...mapActions(['send','getLatestProposalIds','getGovernorParams','getPower','getDelegatee','getProposalState']),
-    lsGet, lsSet,
     async loadData() {
       this.params = await this.getGovernorParams(this.space);
       this.delegatee = await this.getDelegatee(this.space);
@@ -211,34 +216,14 @@ export default {
         return;
       }
 
-      this.loading = true;
+      this.form.key = this.key;
       this.form.contractAddress = this.space.governor;
       let proposalName = this.name;
       if(this.body)proposalName += (";" + this.body);
+      this.form.proposalName = proposalName;
+      this.form.space = this.space;
       this.form.args = [this.targets,this.values,this.signatures,this.calldatas,proposalName];
-      try {
-        const result = await this.send({
-          type: 'proposal',
-          payload: this.form
-        });
-
-        if(result){
-          const id = await this.getLatestProposalIds(this.space);
-          this.lsSet(this.space.network+id,proposalName);
-          this.$router.push({
-            name: 'proposal',
-            params: {
-              key: this.key,
-              id
-            }
-          });
-        }else{ 
-          this.loading = false;
-        }
-      } catch (e) {
-        console.error(e);
-        this.loading = false;
-      }
+      this.confirmModalOpen = true;
     }
   }
 };
