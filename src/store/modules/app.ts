@@ -164,8 +164,8 @@ const actions = {
             network: '106',
             skin: 'yearn',
             symbol: 'SYX',
-            token: '0x2de7063fe77aAFB5b401d65E5A108649Ec577170',
-            governor: '0xdEdBCBdEc215a32bB75acfc278F57dCEb2fb6da1',
+            token: '0x01Db6ACFA20562Ba835aE9F5085859580A0b1386',
+            governor: '0x7DF0c84197D35356b1d4F29912082371f3469fF5',
             logsFromBlock: 3654175,
             members: [],
             strategies: []
