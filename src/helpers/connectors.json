@@ -1,12 +1,12 @@
 {
-  "injected": {
-    "id": "injected",
-    "icon": "velas-icon.57x57",
-    "name": "VELAS"
-  },
-  "injected2": {
-    "id": "injected",
-    "icon": "metamask",
-    "name": "MetaMask"
-  }
+    "injected": {
+        "id": "injected",
+        "icon": "velas-icon.57x57",
+        "name": "DeFi Wallet"
+    },
+    "injected2": {
+        "id": "injected",
+        "icon": "metamask",
+        "name": "MetaMask"
+    }
 }

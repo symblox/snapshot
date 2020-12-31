@@ -93,10 +93,13 @@ const actions = {
       ]);
       commit('HANDLE_CHAIN_CHANGED', network.chainId);
       const account = accounts.length > 0 ? accounts[0] : null;
-      const name = await getProvider(1).lookupAddress(account);
+      const provider = await getProvider(106);
+
+      //const ENSName = await provider.lookupAddress(account);
+      const ENSName = null;
       commit('LOAD_PROVIDER_SUCCESS', {
         account,
-        name
+        ENSName
       });
     } catch (e) {
       commit('LOAD_PROVIDER_FAILURE', e);
