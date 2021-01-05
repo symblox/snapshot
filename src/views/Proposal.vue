@@ -15,13 +15,16 @@
                             <span v-text="`#${id.slice(0, 7)}`" class="text-gray" />
                         </h1>
                         <State :proposal="proposal" class="mb-4" />
-                    
-                        
-                        <UiMarkdown :body="body" class="mb-6" />                
+
+                        <UiMarkdown :body="body" class="mb-6" />
                     </template>
                     <PageLoading v-else />
                 </div>
-                <Block v-if="loaded && payload.state === 'Active' && !receipt.hasVoted" class="mb-4" :title="$t('page.voteTitle')">
+                <Block
+                    v-if="loaded && payload.state === 'Active' && !receipt.hasVoted"
+                    class="mb-4"
+                    :title="$t('page.voteTitle')"
+                >
                     <div class="mb-3">
                         <UiButton
                             v-for="(choice, i) in payload.choices"
@@ -35,8 +38,12 @@
                                 v-if="_get(payload, `metadata.plugins.aragon.choice${i + 1}`)"
                                 @click="modalOpen = true"
                                 :aria-label="
-                                    `Target address: ${payload.metadata.plugins.aragon[`choice${i + 1}`].actions[0].targetAddress}\nCalldata: ${
-                                        payload.metadata.plugins.aragon[`choice${i + 1}`].actions[0].calldata
+                                    `Target address: ${
+                                        payload.metadata.plugins.aragon[`choice${i + 1}`].actions[0]
+                                            .targetAddress
+                                    }\nCalldata: ${
+                                        payload.metadata.plugins.aragon[`choice${i + 1}`].actions[0]
+                                            .calldata
                                     }`
                                 "
                                 class="tooltipped tooltipped-n break-word"
@@ -51,7 +58,7 @@
                         @click="modalOpen = true"
                         class="d-block width-full button--submit"
                     >
-                        {{$t('page.vote')}}
+                        {{ $t('page.vote') }}
                     </UiButton>
                 </Block>
                 <BlockVotes v-if="loaded" :space="space" :proposal="proposal" :votes="votes" />
@@ -76,11 +83,11 @@
             </a>
           </div> -->
                     <div class="mb-1">
-                        <b>{{$t('page.author')}}</b>
+                        <b>{{ $t('page.author') }}</b>
                         <User :address="proposal.address" :space="space" class="float-right" />
                     </div>
                     <div class="mb-1">
-                        <b>{{$t('page.id')}}</b>
+                        <b>{{ $t('page.id') }}</b>
                         <a class="float-right">
                             #{{ proposal.id }}
                             <!-- <Icon name="external-link" class="ml-1" /> -->
@@ -88,7 +95,7 @@
                     </div>
                     <div>
                         <div class="mb-1">
-                            <b>{{$t('page.startDate')}}</b>
+                            <b>{{ $t('page.startDate') }}</b>
                             <span
                                 :aria-label="_ms(payload.start)"
                                 v-text="$d(payload.start * 1e3, 'short')"
@@ -96,7 +103,7 @@
                             />
                         </div>
                         <div class="mb-1">
-                            <b>{{$t('page.endDate')}}</b>
+                            <b>{{ $t('page.endDate') }}</b>
                             <span
                                 :aria-label="_ms(payload.end)"
                                 v-text="$d(payload.end * 1e3, 'short')"
@@ -116,7 +123,13 @@
             </div> -->
                     </div>
                 </Block>
-                <BlockResults :id="id" :space="space" :payload="payload" :results="results" :votes="votes" />
+                <BlockResults
+                    :id="id"
+                    :space="space"
+                    :payload="payload"
+                    :results="results"
+                    :votes="votes"
+                />
             </div>
         </div>
         <ModalConfirm
@@ -133,13 +146,18 @@
             :snapshot="payload.snapshot"
             :delegatee="delegatee"
         />
-        <ModalStrategies :open="modalStrategiesOpen" @close="modalStrategiesOpen = false" :space="space" :strategies="space.strategies" />
+        <ModalStrategies
+            :open="modalStrategiesOpen"
+            @close="modalStrategiesOpen = false"
+            :space="space"
+            :strategies="space.strategies"
+        />
     </Container>
 </template>
 
 <script>
 import {mapActions} from 'vuex';
-import { lsGet, lsSet } from '@/helpers/utils';
+import {lsGet, lsSet} from '@/helpers/utils';
 
 export default {
     data() {
@@ -170,11 +188,23 @@ export default {
         payload() {
             return this.proposal.msg ? this.proposal.msg.payload : {};
         },
-        title () {     
-            return this.lsGet(this.app.spaces[this.web3.network.chainId].network+this.proposal.id).split(';')[0] || '';
+        title() {
+            return (
+                this.lsGet(
+                    this.app.spaces[this.web3.network.chainId].network + this.proposal.id
+                ).split(';')[0] || ''
+            );
         },
-        body () {
-            return this.lsGet(this.app.spaces[this.web3.network.chainId].network+this.proposal.id).split(';')[1] || '';
+        body() {
+            const context = this.lsGet(
+                this.app.spaces[this.web3.network.chainId].network + this.proposal.id
+            );
+            if (context) {
+                const title = context.split(';')[0];
+                return context.slice(title.length + 1, context.length);
+            } else {
+                return '';
+            }
         },
         ts() {
             return (Date.now() / 1e3).toFixed();
@@ -185,7 +215,7 @@ export default {
     },
     watch: {
         'web3.account': async function(val, prev) {
-            if (val && val.toLowerCase() !== prev){
+            if (val && val.toLowerCase() !== prev) {
                 this.loading = true;
                 this.loaded = false;
                 await this.loadPower();
@@ -195,7 +225,7 @@ export default {
             }
         },
         'web3.network.chainId': async function(val, prev) {
-            if (val.toString() !== prev.toString()){
+            if (val.toString() !== prev.toString()) {
                 this.loading = true;
                 this.loaded = false;
                 await this.loadPower();
@@ -203,10 +233,10 @@ export default {
                 this.loading = false;
                 this.loaded = true;
             }
-        },
+        }
     },
     methods: {
-        ...mapActions(['getProposal', 'getPower', 'send', 'getReceipt','getDelegatee']),
+        ...mapActions(['getProposal', 'getPower', 'send', 'getReceipt', 'getDelegatee']),
         lsGet,
         lsSet,
         async loadProposal() {
@@ -218,12 +248,12 @@ export default {
                 space: this.space,
                 id: this.id
             });
-            if(proposalObj){
+            if (proposalObj) {
                 this.proposal = proposalObj.proposal;
                 this.votes = proposalObj.votes;
                 this.results = proposalObj.results;
                 this.hasVoted = proposalObj.hasVoted;
-            }else{
+            } else {
                 this.proposal = {};
                 this.votes = {};
                 this.results = [];
