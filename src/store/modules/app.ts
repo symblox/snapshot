@@ -4,11 +4,17 @@ import {getScores} from '@snapshot-labs/snapshot.js/src/utils';
 import client from '@/helpers/client';
 import ipfs from '@/helpers/ipfs';
 import {formatEther, parseEther} from '@ethersproject/units';
-import {abiEncode} from '@/helpers/content';
+import {abiEncode, abiDecode} from '@/helpers/content';
 import {vlxToEth, ethToVlx} from '@/helpers/vlxAddressConversion';
 import getProvider from '@/helpers/provider';
 import {formatProposal, formatProposals, formatSpace} from '@/helpers/utils';
-import {getBlockNumber, getBlockTimestamp, signMessage, getContract, sendTransaction} from '@/helpers/web3';
+import {
+    getBlockNumber,
+    getBlockTimestamp,
+    signMessage,
+    getContract,
+    sendTransaction
+} from '@/helpers/web3';
 import {version} from '@/../package.json';
 
 const secondsPerBlock = 5;
@@ -63,6 +69,15 @@ const mutations = {
     },
     GET_PROPOSAL_STATE_SUCCESS() {
         console.debug('GET_PROPOSAL_STATE_SUCCESS');
+    },
+    GET_PROPOSAL_ACTIONS_REQUEST() {
+        console.debug('GET_PROPOSAL_ACTIONS_REQUEST');
+    },
+    GET_PROPOSAL_ACTIONS_SUCCESS() {
+        console.debug('GET_PROPOSAL_ACTIONS_SUCCESS');
+    },
+    GET_PROPOSAL_ACTIONS_FAILURE() {
+        console.debug('GET_PROPOSAL_ACTIONS_FAILURE');
     },
     GET_PROPOSAL_STATE_FAILURE() {
         console.debug('GET_PROPOSAL_STATE_FAILURE');
@@ -128,14 +143,17 @@ const actions = {
     loading: ({commit}, payload) => {
         commit('SET', {loading: payload});
     },
-    encode: async ({commit}, payload) => {
-      return await abiEncode(payload.coerceFunc, payload.types, payload.values);
+    decode: ({commit}, payload) => {
+        return abiDecode(payload.types, payload.values);
+    },
+    encode: ({commit}, payload) => {
+        return abiEncode(payload.types, payload.values);
     },
     ethToVlx({commit}, address) {
-      return ethToVlx(address);
+        return ethToVlx(address);
     },
     vlxToEth({commit}, address) {
-      return vlxToEth(address);
+        return vlxToEth(address);
     },
     formatEther: async ({commit}, amount) => {
         return await formatEther(amount);
@@ -171,7 +189,9 @@ const actions = {
             strategies: []
         };
 
-        spaces = Object.fromEntries(Object.entries(spaces).map(space => [space[0], formatSpace(space[0], space[1])]));
+        spaces = Object.fromEntries(
+            Object.entries(spaces).map(space => [space[0], formatSpace(space[0], space[1])])
+        );
         commit('SET', {spaces});
         return spaces;
     },
@@ -179,7 +199,12 @@ const actions = {
         const auth = getInstance();
         commit('SEND_REQUEST');
         try {
-            const result: any = await sendTransaction(auth.web3, [payload.contractType, payload.contractAddress, payload.action, [...payload.args]]);
+            const result: any = await sendTransaction(auth.web3, [
+                payload.contractType,
+                payload.contractAddress,
+                payload.action,
+                [...payload.args]
+            ]);
             console.log('tx: ', result);
             commit('SEND_SUCCESS');
             dispatch('notify', ['green', `Your ${type} is in!`]);
@@ -187,7 +212,10 @@ const actions = {
             return true;
         } catch (e) {
             commit('SEND_FAILURE', e);
-            const errorMessage = e && e.error_description ? `Oops, ${e.error_description}` : 'Oops, something went wrong!';
+            const errorMessage =
+                e && e.error_description
+                    ? `Oops, ${e.error_description}`
+                    : 'Oops, something went wrong!';
             dispatch('notify', ['red', errorMessage]);
             return false;
         }
@@ -207,7 +235,7 @@ const actions = {
         }
     },
     getProposalState: async ({commit}, {space, id}) => {
-      console.log('getProposalState')
+        console.log('getProposalState');
         commit('GET_PROPOSAL_STATE_REQUEST');
         try {
             const provider = getProvider(space.network);
@@ -216,8 +244,22 @@ const actions = {
             commit('GET_PROPOSAL_STATE_SUCCESS');
             return proposalState[stateId];
         } catch (e) {
-            console.log(e)
+            console.log(e);
             commit('GET_PROPOSAL_STATE_FAILURE', e);
+        }
+    },
+    getProposalActions: async ({commit}, {space, id}) => {
+        console.log('getProposalActions');
+        commit('GET_PROPOSAL_ACTIONS_REQUEST');
+        try {
+            const provider = getProvider(space.network);
+            const contract = await getContract(space.governor, 'Governor', provider);
+            const params = await contract.getActions(id);
+            commit('GET_PROPOSAL_ACTIONS_SUCCESS');
+            return params;
+        } catch (e) {
+            console.log(e);
+            commit('GET_PROPOSAL_ACTIONS_FAILURE', e);
         }
     },
     getDelegatee: async ({commit}, space) => {
@@ -260,7 +302,6 @@ const actions = {
 
             const proposalCreatedFilter = contract.filters.ProposalCreated();
             proposalCreatedFilter['fromBlock'] = space.logsFromBlock;
-            
 
             const proposalCreatedLogs = await provider.getLogs(proposalCreatedFilter);
 
@@ -272,7 +313,8 @@ const actions = {
                     if (curBlockNumber > startBlock) {
                         startTimestamp = await getBlockTimestamp(provider, parseFloat(startBlock));
                     } else {
-                        startTimestamp = curTimestamp + (startBlock - curBlockNumber) * secondsPerBlock;
+                        startTimestamp =
+                            curTimestamp + (startBlock - curBlockNumber) * secondsPerBlock;
                     }
 
                     if (curBlockNumber > endBlock) {
@@ -288,6 +330,7 @@ const actions = {
                         address: proposer,
                         msg: {
                             payload: {
+                                transactionHash: log.transactionHash,
                                 name: description,
                                 start: startTimestamp,
                                 end: endTimestamp,
@@ -305,18 +348,18 @@ const actions = {
         }
     },
     getReceipt: async ({commit}, payload) => {
-      try {
-        const auth = getInstance();
-        const accounts = await auth.web3.listAccounts();
-        const contract = await getContract(payload.space.governor, 'Governor', auth.web3);
-        const receipt = await contract.getReceipt(payload.id, accounts[0]);
+        try {
+            const auth = getInstance();
+            const accounts = await auth.web3.listAccounts();
+            const contract = await getContract(payload.space.governor, 'Governor', auth.web3);
+            const receipt = await contract.getReceipt(payload.id, accounts[0]);
 
-        return receipt
-      } catch (error) {
-        return {
-          hasVoted: false
-        };
-      }  
+            return receipt;
+        } catch (error) {
+            return {
+                hasVoted: false
+            };
+        }
     },
     getProposal: async ({commit}, payload) => {
         commit('GET_PROPOSAL_REQUEST');
@@ -333,7 +376,8 @@ const actions = {
             if (blockNumber > proposal.startBlock) {
                 startTimestamp = await getBlockTimestamp(provider, parseFloat(proposal.startBlock));
             } else {
-                startTimestamp = curTimestamp + (proposal.startBlock - blockNumber) * secondsPerBlock;
+                startTimestamp =
+                    curTimestamp + (proposal.startBlock - blockNumber) * secondsPerBlock;
             }
 
             if (blockNumber > proposal.endBlock) {
@@ -394,7 +438,8 @@ const actions = {
                 // totalVotes: [proposal.forVotes, proposal.againstVotes],
                 totalBalances: [forVotes, againstVotes],
                 totalScores: [forVotes, againstVotes],
-                totalVotesBalances: parseFloat(forVotes.toString()) + parseFloat(againstVotes.toString())
+                totalVotesBalances:
+                    parseFloat(forVotes.toString()) + parseFloat(againstVotes.toString())
             };
             commit('GET_PROPOSAL_SUCCESS');
             return result;
@@ -407,11 +452,11 @@ const actions = {
         try {
             const provider = getProvider(space.network);
             const contract = await getContract(space.token, 'SYX', provider);
-            if(!blockNumber){
-              blockNumber = await getBlockNumber(getProvider(space.network)) - 1;
+            if (!blockNumber) {
+                blockNumber = (await getBlockNumber(getProvider(space.network))) - 1;
             }
             const balance = await contract.getPriorVotes(address, blockNumber);
-            
+
             //const blockTag = snapshot > blockNumber ? 'latest' : parseInt(snapshot);
             // let scores: any = await getScores(
             //   space.strategies,

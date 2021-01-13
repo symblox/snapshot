@@ -60,5 +60,10 @@ export default {
     function: 'Function',
     params: 'Params',
     body: 'What is your proposal?',
-    Choose: 'Choose...'
+    Choose: 'Choose...',
+    transaction: 'Transaction details',
+    proposalParams: 'Proposal params',
+    addPool: 'Add a new pool and set the reward ratio to {ratio} lpToken address {lpToken}',
+    setRewardRatio: 'Trading pool ID:{poolId} set the reward ratio to {ratio}',
+    setConnectorImpl: 'Set connector Impl Address'
 };
