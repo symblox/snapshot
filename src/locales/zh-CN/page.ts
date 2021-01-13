@@ -60,5 +60,10 @@ export default {
     function: '方法',
     params: '参数',
     body: '你有什么建议？',
-    choose: '选择...'
+    choose: '选择...',
+    transaction: '交易明细',
+    proposalParams: '提案数据',
+    addPool: '添加新池,设置奖励比例为{ratio} lpToken地址{lpToken}',
+    setRewardRatio: '交易池 ID：{poolId} 设置奖励比例为{ratio}',
+    setConnectorImpl: '设置连接器逻辑地址'
 };

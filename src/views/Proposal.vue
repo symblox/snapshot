@@ -15,7 +15,31 @@
                             <span v-text="`#${id.slice(0, 7)}`" class="text-gray" />
                         </h1>
                         <State :proposal="proposal" class="mb-4" />
-
+                        <div class="mb-2">
+                            <p>{{ $t('page.transaction') }}</p>
+                            <a
+                                v-text="transactionHash"
+                                :href="explorer + '/tx/' + transactionHash"
+                                target="_blank"
+                            />
+                        </div>
+                        <div class="mb-4">
+                            <p>{{ $t('page.proposalParams') }}</p>
+                            <div v-for="(action, i) in actions" :key="i" class="mb-1">
+                                {{ i + 1 }}：
+                                <a
+                                    v-text="action.contractName"
+                                    :href="explorer + '/address/' + action.contractAddress"
+                                    target="_blank"
+                                />
+                                .
+                                {{ action.funcName }}
+                                <div>
+                                    {{ $t(action.message, action.messageParams) }}
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
                         <UiMarkdown :body="body" class="mb-6" />
                     </template>
                     <PageLoading v-else />
@@ -157,6 +181,8 @@
 
 <script>
 import {mapActions} from 'vuex';
+import networks from '@/helpers/networks.json';
+import {TARGETS} from '@/helpers/proposal';
 import {lsGet, lsSet} from '@/helpers/utils';
 
 export default {
@@ -181,6 +207,12 @@ export default {
         };
     },
     computed: {
+        networkId() {
+            return this.web3.network.chainId;
+        },
+        explorer() {
+            return networks[this.web3.network.chainId].explorer;
+        },
         space() {
             const space = this.app.spaces[this.web3.network.chainId];
             return space || {};
@@ -202,6 +234,18 @@ export default {
             if (context) {
                 const title = context.split(';')[0];
                 return context.slice(title.length + 1, context.length);
+            } else {
+                return '';
+            }
+        },
+        transactionHash() {
+            const context = this.lsGet(
+                this.app.spaces[this.web3.network.chainId].network +
+                    this.proposal.id +
+                    'transactionHash'
+            );
+            if (context) {
+                return context;
             } else {
                 return '';
             }
@@ -236,7 +280,16 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['getProposal', 'getPower', 'send', 'getReceipt', 'getDelegatee']),
+        ...mapActions([
+            'getProposal',
+            'getProposalActions',
+            'getPower',
+            'encode',
+            'decode',
+            'send',
+            'getReceipt',
+            'getDelegatee'
+        ]),
         lsGet,
         lsSet,
         async loadProposal() {
@@ -248,6 +301,69 @@ export default {
                 space: this.space,
                 id: this.id
             });
+            const actions = await this.getProposalActions({
+                space: this.space,
+                id: this.id
+            });
+            const rewardManagerAddress = TARGETS[this.networkId].rewardManager.address;
+            const connectorFactoryAddress = TARGETS[this.networkId].connectorFactory.address;
+            const decode = this.decode;
+            this.actions = [];
+            for (let i = 0; i < actions[0].length; i++) {
+                const v = actions[0][i];
+                let contractName;
+                switch (v.toLowerCase()) {
+                    case rewardManagerAddress.toLowerCase():
+                        contractName = 'rewardManager';
+                        break;
+                    case connectorFactoryAddress.toLowerCase():
+                        contractName = 'connectorFactory';
+                        break;
+                    default:
+                        contractName = v;
+                }
+                const funcName = actions[2][i];
+                const types = funcName
+                    .split('(')[1]
+                    .split(')')[0]
+                    .split(',');
+                const data = await decode({
+                    types: types,
+                    values: actions[3][i]
+                });
+                let message, messageParams;
+                switch (funcName) {
+                    case 'add(uint256,address,bool)':
+                        message = 'page.addPool';
+                        messageParams = {
+                            ratio: data[0] / 10 ** 18,
+                            lpToken: data[1]
+                        };
+                        break;
+                    case 'set(uint256,uint256,bool)':
+                        message = 'page.setRewardRatio';
+                        messageParams = {
+                            poolId: data[0],
+                            ratio: data[1] / 10 ** 18
+                        };
+                        break;
+                    case 'setConnectorImpl(uint8,address)':
+                        message = 'page.setConnectorImpl';
+                        break;
+                    default:
+                        message = '';
+                }
+
+                this.actions.push({
+                    contractName,
+                    contractAddress: v,
+                    funcName: funcName.split('(')[0] + '(' + data.join(',') + ')',
+                    message,
+                    messageParams,
+                    data
+                });
+            }
+
             if (proposalObj) {
                 this.proposal = proposalObj.proposal;
                 this.votes = proposalObj.votes;
