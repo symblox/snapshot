@@ -39,6 +39,7 @@
                                 </div>
                             </div>
                         </div>
+                        <hr />
                         <UiMarkdown :body="body" class="mb-6" />
                     </template>
                     <PageLoading v-else />
