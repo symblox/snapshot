@@ -64,7 +64,7 @@ export default {
     transaction: '交易明细',
     proposalParams: '提案数据',
     addPool: '添加新池,设置奖励比例为{ratio} lpToken地址{lpToken}',
-    setRewardRatio: '交易池 ID：{poolId} 设置奖励比例为{ratio}',
+    setRewardRatio: '交易池 ID:{poolId}，设置奖励比例为{ratio}',
     setConnectorImpl: '设置连接器逻辑地址 交易池 ID：{poolId} 逻辑地址 {address}',
     proposalParamsInput: '提案输入参数',
     proposalParamsSend: '提案提交参数'
