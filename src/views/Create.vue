@@ -63,12 +63,14 @@
             :values="values"
             :signatures="signatures"
             :calldatas="calldatas"
+            :proposalParams="proposalParams"
             :open="modalOpen"
             :networkId="web3.network.chainId"
             @close="modalOpen = false"
         />
         <ModalProposalConfirm
             :form="form"
+            :proposalParams="proposalParams"
             :open="confirmModalOpen"
             :networkId="web3.network.chainId"
             @close="confirmModalOpen = false"
@@ -110,6 +112,7 @@ export default {
             values: [],
             signatures: [],
             calldatas: [],
+            proposalParams: [],
             blockNumber: -1,
             params: {},
             scores: 0,
@@ -196,6 +199,7 @@ export default {
             this.values.splice(i, 1);
             this.signatures.splice(i, 1);
             this.calldatas.splice(i, 1);
+            this.proposalParams.splice(i, 1);
         },
 
         async handleSubmit() {
@@ -237,6 +241,7 @@ export default {
                 this.calldatas,
                 proposalName
             ];
+            this.form.params = this.form.a;
             this.confirmModalOpen = true;
         }
     }

@@ -70,7 +70,16 @@
 import {TARGETS} from '@/helpers/proposal';
 import {mapActions} from 'vuex';
 export default {
-    props: ['open', 'networkId', 'targets', 'values', 'signatures', 'calldatas'],
+    props: [
+        'open',
+        'networkId',
+        'targets',
+        'values',
+        'signatures',
+        'calldatas',
+        'proposalParams',
+        'params'
+    ],
     data() {
         return {
             target: TARGETS[this.networkId],
@@ -112,6 +121,7 @@ export default {
             this.values.push('0');
             this.signatures.push(this.form.signature);
             let callData;
+            this.proposalParams.push(this.form.args);
             for (let i = 0; i < this.form.args.length; i++) {
                 if (
                     this.target[this.activeTarget].actions[this.functionKey].formats[i] === 'toWei'
@@ -120,8 +130,22 @@ export default {
                         await this.parseEther(this.form.args[i].toString())
                     ).toString();
                 }
-            }
 
+                if (
+                    this.target[this.activeTarget].actions[this.functionKey].formats[i] === 'bool'
+                ) {
+                    if (
+                        this.form.args[i] === 1 ||
+                        this.form.args[i] === '1' ||
+                        this.form.args[i] === 'true' ||
+                        this.form.args[i] === true
+                    ) {
+                        this.form.args[i] = true;
+                    } else {
+                        this.form.args[i] = false;
+                    }
+                }
+            }
             try {
                 callData = await this.encode({
                     types: this.form.types,
