@@ -66,7 +66,8 @@ export default {
     addPool:
         'Add a new pool and set the reward ratio to {ratio} with liquidity provider token address: {lpToken}',
     setRewardRatio: 'For swap pool ID:{poolId}, set the reward ratio to {ratio} ',
-    setConnectorImpl: 'Set the connector implementation address',
+    setConnectorImpl:
+        'Set the connector implementation address swap pool ID:{poolId} implementation address {address}',
     proposalParamsInput: 'Proposal input params',
     proposalParamsSend: 'Proposal send params'
 };

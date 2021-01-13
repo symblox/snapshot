@@ -349,6 +349,10 @@ export default {
                         break;
                     case 'setConnectorImpl(uint8,address)':
                         message = 'page.setConnectorImpl';
+                        messageParams = {
+                            poolId: data[0],
+                            address: data[1]
+                        };
                         break;
                     default:
                         message = '';
