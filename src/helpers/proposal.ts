@@ -14,6 +14,12 @@ export const TARGETS = {
                     params: ['reward pool id(number)', 'alloc point(number)', 'with update(bool)'],
                     types: ['uint256', 'uint256', 'bool'],
                     formats: ['', 'toWei', 'bool']
+                },
+                {
+                    signature: 'startNewSeason()',
+                    params: [],
+                    types: [],
+                    formats: []
                 }
             ]
         },
@@ -44,6 +50,12 @@ export const TARGETS = {
                     params: ['reward pool id(number)', 'alloc point(number)', 'with update(bool)'],
                     types: ['uint256', 'uint256', 'bool'],
                     formats: ['', 'toWei', 'bool']
+                },
+                {
+                    signature: 'startNewSeason()',
+                    params: [],
+                    types: [],
+                    formats: []
                 }
             ]
         },
