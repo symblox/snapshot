@@ -36,8 +36,40 @@ export const TARGETS = {
         }
     },
     '111': {
+        symblox: {
+            address: '0xa94BFDE008232f03A7C34b7B994CcAA07a28283D',
+            actions: [
+                {
+                    signature: 'mint(address,uint256)',
+                    params: ['target address(address)', 'mint amount(number)'],
+                    types: ['address', 'uint256'],
+                    formats: ['', 'toWei']
+                },
+                {
+                    signature: 'approve(address,uint256)',
+                    params: ['target address(address)', 'approve amount(number)'],
+                    types: ['address', 'uint256'],
+                    formats: ['', 'toWei']
+                }
+            ]
+        },
+        omnibridge: {
+            address: '0xF058A68E14e0f4dd3DDf265c67b3898639A74a1f',
+            actions: [
+                {
+                    signature: 'relayTokens(address,address,uint256)',
+                    params: [
+                        'token address(address)',
+                        'target address(address)',
+                        'omni amount(number)'
+                    ],
+                    types: ['address', 'address', 'uint256'],
+                    formats: ['', '', 'toWei']
+                }
+            ]
+        },
         rewardManager: {
-            address: '0x8b2B0CE402b33b5A2744371311E3053EAB2E2f3d',
+            address: '0x0C9d86dD84F0F46a64bE283ecAeDA5517e1A60Cf',
             actions: [
                 {
                     signature: 'add(uint256,address,bool)',
@@ -60,7 +92,7 @@ export const TARGETS = {
             ]
         },
         connectorFactory: {
-            address: '0xff165a0eeCc3CcB0057e7a8cf7E83Af4ea4d253a',
+            address: '0x9B666C4B5C7dF17b80f5e2a34f61111dD29720D9',
             actions: [
                 {
                     signature: 'setConnectorImpl(uint8,address)',
