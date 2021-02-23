@@ -323,7 +323,11 @@ const actions = {
                         endTimestamp = curTimestamp + (endBlock - curBlockNumber) * secondsPerBlock;
                     }
 
-                    const stateId = await contract.state(id);
+                    const proposal = await contract.proposals(id);
+                    let stateId = await contract.state(id);
+                    if (proposal.executed) {
+                        stateId = 7;
+                    }
 
                     return {
                         id: id.toString(),
@@ -370,7 +374,11 @@ const actions = {
             const blockNumber = await getBlockNumber(provider);
             const curTimestamp = await getBlockTimestamp(provider, blockNumber);
             const proposal = await contract.proposals(payload.id);
-            const stateId = await contract.state(payload.id);
+            let stateId = await contract.state(payload.id);
+
+            if (proposal.executed) {
+                stateId = 7;
+            }
 
             let startTimestamp, endTimestamp;
             if (blockNumber > proposal.startBlock) {

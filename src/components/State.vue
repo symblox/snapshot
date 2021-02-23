@@ -23,11 +23,10 @@ export default {
                 Expired: this.$t('page.expired'),
                 Executed: this.$t('page.executed')
             };
-            if(!this.proposal.msg || !this.proposal.msg.payload){
+            if (!this.proposal.msg || !this.proposal.msg.payload) {
                 return {name: stateText['All'], class: 'All'};
             }
             const {state} = this.proposal.msg.payload;
-            
             return {name: stateText[state], class: state};
         }
     }
