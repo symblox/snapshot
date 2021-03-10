@@ -1,5 +1,22 @@
 export const TARGETS = {
     '106': {
+        symblox: {
+            address: '0xD0CB9244844F3E11061fb3Ea136Aab3a6ACAC017',
+            actions: [
+                {
+                    signature: 'mint(address,uint256)',
+                    params: ['target address(address)', 'mint amount(number)'],
+                    types: ['address', 'uint256'],
+                    formats: ['', 'toWei']
+                },
+                {
+                    signature: 'approve(address,uint256)',
+                    params: ['target address(address)', 'approve amount(number)'],
+                    types: ['address', 'uint256'],
+                    formats: ['', 'toWei']
+                }
+            ]
+        },
         rewardManager: {
             address: '0x9fCdD9eb40CaC90A5C385C9Ef37b48E847B178a3',
             actions: [
