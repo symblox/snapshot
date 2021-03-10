@@ -37,7 +37,7 @@ export const TARGETS = {
     },
     '111': {
         symblox: {
-            address: '0xa94BFDE008232f03A7C34b7B994CcAA07a28283D',
+            address: '0xBfb78Cc60F388Bf4A0a3449ab66DA152c258614C',
             actions: [
                 {
                     signature: 'mint(address,uint256)',
@@ -69,7 +69,7 @@ export const TARGETS = {
             ]
         },
         rewardManager: {
-            address: '0x0C9d86dD84F0F46a64bE283ecAeDA5517e1A60Cf',
+            address: '0xD744A712a83861C9C46Db0C39B282E60aFA04656',
             actions: [
                 {
                     signature: 'add(uint256,address,bool)',
@@ -82,12 +82,6 @@ export const TARGETS = {
                     params: ['reward pool id(number)', 'alloc point(number)', 'with update(bool)'],
                     types: ['uint256', 'uint256', 'bool'],
                     formats: ['', 'toWei', 'bool']
-                },
-                {
-                    signature: 'startNewSeason()',
-                    params: [],
-                    types: [],
-                    formats: []
                 }
             ]
         },
