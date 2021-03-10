@@ -31,7 +31,7 @@ export const TARGETS = {
     },
     '111': {
         symblox: {
-            address: '0xBfb78Cc60F388Bf4A0a3449ab66DA152c258614C',
+            address: '0x946b06FE625aB1AaA27294F8ed09713C8812626c',
             actions: [
                 {
                     signature: 'mint(address,uint256)',
@@ -63,7 +63,7 @@ export const TARGETS = {
             ]
         },
         rewardManager: {
-            address: '0x009430A9f25654Ee6e27E94fE277B68f115150D0',
+            address: '0x5EddDA6482029E466F296AeD75cFcc624245bB80',
             actions: [
                 {
                     signature: 'add(uint256,address,bool)',
