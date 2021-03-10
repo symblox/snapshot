@@ -17,8 +17,6 @@ import {
 } from '@/helpers/web3';
 import {version} from '@/../package.json';
 
-const secondsPerBlock = 5;
-
 const state = {
     init: false,
     loading: false,
@@ -174,7 +172,8 @@ const actions = {
             governor: '0xf175A628Fc110296596BD0eddEbE0f1c5e84d2CA',
             logsFromBlock: 2957399,
             members: [],
-            strategies: []
+            strategies: [],
+            secondsPerBlock: 10
         };
         spaces['106'] = {
             domain: 'https://app.symblox.io/',
@@ -186,7 +185,8 @@ const actions = {
             governor: '0x7DF0c84197D35356b1d4F29912082371f3469fF5',
             logsFromBlock: 3654175,
             members: [],
-            strategies: []
+            strategies: [],
+            secondsPerBlock: 5
         };
 
         spaces = Object.fromEntries(
@@ -314,13 +314,14 @@ const actions = {
                         startTimestamp = await getBlockTimestamp(provider, parseFloat(startBlock));
                     } else {
                         startTimestamp =
-                            curTimestamp + (startBlock - curBlockNumber) * secondsPerBlock;
+                            curTimestamp + (startBlock - curBlockNumber) * space.secondsPerBlock;
                     }
 
                     if (curBlockNumber > endBlock) {
                         endTimestamp = await getBlockTimestamp(provider, parseFloat(endBlock));
                     } else {
-                        endTimestamp = curTimestamp + (endBlock - curBlockNumber) * secondsPerBlock;
+                        endTimestamp =
+                            curTimestamp + (endBlock - curBlockNumber) * space.secondsPerBlock;
                     }
 
                     const proposal = await contract.proposals(id);
@@ -385,13 +386,16 @@ const actions = {
                 startTimestamp = await getBlockTimestamp(provider, parseFloat(proposal.startBlock));
             } else {
                 startTimestamp =
-                    curTimestamp + (proposal.startBlock - blockNumber) * secondsPerBlock;
+                    curTimestamp +
+                    (proposal.startBlock - blockNumber) * payload.space.secondsPerBlock;
             }
 
             if (blockNumber > proposal.endBlock) {
                 endTimestamp = await getBlockTimestamp(provider, parseFloat(proposal.endBlock));
             } else {
-                endTimestamp = curTimestamp + (proposal.endBlock - blockNumber) * secondsPerBlock;
+                endTimestamp =
+                    curTimestamp +
+                    (proposal.endBlock - blockNumber) * payload.space.secondsPerBlock;
             }
 
             const result: any = {};
