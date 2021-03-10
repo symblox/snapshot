@@ -62,10 +62,11 @@ export default {
     body: '你有什么建议？',
     choose: '选择...',
     transaction: '交易明细',
-    proposalParams: '提案数据',
+    proposalParams: '预计执行内容',
     addPool: '添加新池,设置奖励比例为{ratio} lpToken地址{lpToken}',
     setRewardRatio: '交易池 ID:{poolId}，设置奖励比例为{ratio}',
     setConnectorImpl: '设置连接器逻辑地址 交易池 ID：{poolId} 逻辑地址 {address}',
+    mintSyx: '向奖励池 {farm} 发行数量为 {amount} 的 SYX 代币',
     proposalParamsInput: '提案输入参数',
     proposalParamsSend: '提案提交参数'
 };

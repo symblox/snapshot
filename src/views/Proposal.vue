@@ -354,6 +354,13 @@ export default {
                             address: data[1]
                         };
                         break;
+                    case 'mint(address,uint256)':
+                        message = 'page.mintSyx';
+                        messageParams = {
+                            farm: data[0],
+                            amount: data[1]
+                        };
+                        break;
                     default:
                         message = '';
                 }

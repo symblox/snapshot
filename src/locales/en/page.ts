@@ -68,6 +68,7 @@ export default {
     setRewardRatio: 'For swap pool ID:{poolId}, set the reward ratio to {ratio} ',
     setConnectorImpl:
         'Set the connector implementation address swap pool ID:{poolId} implementation address {address}',
+    mintSyx: 'Send to the reward pool {farm} a total amount of {amount} SYX tokens',
     proposalParamsInput: 'Proposal input params',
     proposalParamsSend: 'Proposal send params'
 };
