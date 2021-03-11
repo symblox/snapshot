@@ -61,8 +61,8 @@ export default {
     params: 'Params',
     body: 'What is your proposal?',
     Choose: 'Choose...',
-    transaction: 'Transaction details',
-    proposalParams: 'Proposal params',
+    transaction: 'Transaction Details',
+    proposalParams: 'Proposed Actions',
     addPool:
         'Add a new pool and set the reward ratio to {ratio} with liquidity provider token address: {lpToken}',
     setRewardRatio: 'For swap pool ID:{poolId}, set the reward ratio to {ratio} ',
