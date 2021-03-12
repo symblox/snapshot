@@ -33,17 +33,6 @@ export const TARGETS = {
                     formats: ['', 'toWei', 'bool']
                 }
             ]
-        },
-        connectorFactory: {
-            address: '0xBE6A1f0b0236BB39E0b16B0fc5cb6C291fFdFC2E',
-            actions: [
-                {
-                    signature: 'setConnectorImpl(uint8,address)',
-                    params: ['reward pool id(number)', 'implementation(address)'],
-                    types: ['uint8', 'address'],
-                    formats: ['', '']
-                }
-            ]
         }
     },
     '111': {
