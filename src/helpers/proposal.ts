@@ -18,7 +18,7 @@ export const TARGETS = {
             ]
         },
         rewardManager: {
-            address: '0x9fCdD9eb40CaC90A5C385C9Ef37b48E847B178a3',
+            address: '0x44DDf8BDcF16667f0E9F452D3E3733Dddf438da0',
             actions: [
                 {
                     signature: 'add(uint256,address,bool)',
