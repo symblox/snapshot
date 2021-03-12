@@ -306,7 +306,6 @@ export default {
                 id: this.id
             });
             const rewardManagerAddress = TARGETS[this.networkId].rewardManager.address;
-            const connectorFactoryAddress = TARGETS[this.networkId].connectorFactory.address;
             const syxTokenAddress = TARGETS[this.networkId].symblox.address;
             const decode = this.decode;
             this.actions = [];
@@ -316,9 +315,6 @@ export default {
                 switch (v.toLowerCase()) {
                     case rewardManagerAddress.toLowerCase():
                         contractName = 'RewardManager';
-                        break;
-                    case connectorFactoryAddress.toLowerCase():
-                        contractName = 'ConnectorFactory';
                         break;
                     case syxTokenAddress.toLowerCase():
                         contractName = 'SymbloxToken';
