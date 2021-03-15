@@ -80,7 +80,7 @@ export const TARGETS = {
             ]
         },
         rewardManager: {
-            address: '0x5EddDA6482029E466F296AeD75cFcc624245bB80',
+            address: '0x7f701D014c80e0644920CC87BAAa0908F7e97A2F',
             actions: [
                 {
                     signature: 'add(uint256,address,bool)',
