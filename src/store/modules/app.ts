@@ -168,9 +168,9 @@ const actions = {
             network: '111',
             skin: 'yearn',
             symbol: 'SYX',
-            token: '0x946b06FE625aB1AaA27294F8ed09713C8812626c',
-            governor: '0xf175A628Fc110296596BD0eddEbE0f1c5e84d2CA',
-            logsFromBlock: 2957399,
+            token: '0x0711FA8e32a4548eb8Fec327275C2b5CD6f4F331',
+            governor: '0xCf008AB68979dC0a67d5b7453A3c3364E65816Ef',
+            logsFromBlock: 0,
             members: [],
             strategies: [],
             secondsPerBlock: 10
@@ -183,7 +183,7 @@ const actions = {
             symbol: 'SYX',
             token: '0xD0CB9244844F3E11061fb3Ea136Aab3a6ACAC017',
             governor: '0x8fA9dD0dA03bC91508D70d2C254dBC25560C04b5',
-            logsFromBlock: 3654175,
+            logsFromBlock: 0,
             members: [],
             strategies: [],
             secondsPerBlock: 5
@@ -302,8 +302,10 @@ const actions = {
 
             const proposalCreatedFilter = contract.filters.ProposalCreated();
             proposalCreatedFilter['fromBlock'] = space.logsFromBlock;
-
+            console.log(provider, proposalCreatedFilter);
             const proposalCreatedLogs = await provider.getLogs(proposalCreatedFilter);
+
+            console.log(proposalCreatedLogs);
 
             const proposals: any = await Promise.all(
                 proposalCreatedLogs.map(async log => {
