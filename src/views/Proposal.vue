@@ -194,6 +194,7 @@ export default {
             loaded: false,
             voteLoading: false,
             proposal: {},
+            proposalLogs: [],
             votes: {},
             results: [],
             receipt: {},
@@ -221,16 +222,16 @@ export default {
             return this.proposal.msg ? this.proposal.msg.payload : {};
         },
         title() {
-            return (
-                this.lsGet(
-                    this.app.spaces[this.web3.network.chainId].network + this.proposal.id
-                ).split(';')[0] || ''
-            );
+            return this.proposalLogs[0] ? this.proposalLogs[0].msg.payload.name.split(';')[0] : '';
+            // this.lsGet(
+            //     this.app.spaces[this.web3.network.chainId].network + this.proposal.id
+            // ).split(';')[0] || ''
         },
         body() {
-            const context = this.lsGet(
-                this.app.spaces[this.web3.network.chainId].network + this.proposal.id
-            );
+            // const context = this.lsGet(
+            //     this.app.spaces[this.web3.network.chainId].network + this.proposal.id
+            // );
+            const context = this.proposalLogs[0].msg.payload.name;
             if (context) {
                 const title = context.split(';')[0];
                 return context.slice(title.length + 1, context.length);
@@ -239,11 +240,12 @@ export default {
             }
         },
         transactionHash() {
-            const context = this.lsGet(
-                this.app.spaces[this.web3.network.chainId].network +
-                    this.proposal.id +
-                    'transactionHash'
-            );
+            // const context = this.lsGet(
+            //     this.app.spaces[this.web3.network.chainId].network +
+            //         this.proposal.id +
+            //         'transactionHash'
+            // );
+            const context = this.proposalLogs[0].msg.payload.transactionHash;
             if (context) {
                 return context;
             } else {
@@ -282,6 +284,7 @@ export default {
     methods: {
         ...mapActions([
             'getProposal',
+            'getProposals',
             'getProposalActions',
             'getPower',
             'encode',
@@ -293,6 +296,12 @@ export default {
         lsGet,
         lsSet,
         async loadProposal() {
+            this.proposalLogs =
+                (await this.getProposals({
+                    space: this.space,
+                    blockNumber: parseInt(this.$route.query.blockNumber)
+                })) || [];
+
             const proposalObj = await this.getProposal({
                 space: this.space,
                 id: this.id

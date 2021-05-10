@@ -170,7 +170,7 @@ const actions = {
             symbol: 'SYX',
             token: '0x0711FA8e32a4548eb8Fec327275C2b5CD6f4F331',
             governor: '0xCf008AB68979dC0a67d5b7453A3c3364E65816Ef',
-            logsFromBlock: 0,
+            logsFromBlock: 1,
             members: [],
             strategies: [],
             secondsPerBlock: 10
@@ -183,7 +183,7 @@ const actions = {
             symbol: 'SYX',
             token: '0xD0CB9244844F3E11061fb3Ea136Aab3a6ACAC017',
             governor: '0x8fA9dD0dA03bC91508D70d2C254dBC25560C04b5',
-            logsFromBlock: 0,
+            logsFromBlock: 1,
             members: [],
             strategies: [],
             secondsPerBlock: 5
@@ -249,7 +249,6 @@ const actions = {
         }
     },
     getProposalActions: async ({commit}, {space, id}) => {
-        console.log('getProposalActions');
         commit('GET_PROPOSAL_ACTIONS_REQUEST');
         try {
             const provider = getProvider(space.network);
@@ -291,7 +290,7 @@ const actions = {
             commit('GET_GOVERNOR_PARAMS_FAILURE', e);
         }
     },
-    getProposals: async ({commit}, space) => {
+    getProposals: async ({commit}, {space, blockNumber}) => {
         commit('GET_PROPOSALS_REQUEST');
         try {
             const provider = getProvider(space.network);
@@ -301,12 +300,8 @@ const actions = {
             const curTimestamp = await getBlockTimestamp(provider, curBlockNumber);
 
             const proposalCreatedFilter = contract.filters.ProposalCreated();
-            proposalCreatedFilter['fromBlock'] = space.logsFromBlock;
-            console.log(provider, proposalCreatedFilter);
+            proposalCreatedFilter['fromBlock'] = blockNumber ? blockNumber : space.logsFromBlock;
             const proposalCreatedLogs = await provider.getLogs(proposalCreatedFilter);
-
-            console.log(proposalCreatedLogs);
-
             const proposals: any = await Promise.all(
                 proposalCreatedLogs.map(async log => {
                     const logData = contract.interface.parseLog(log);
