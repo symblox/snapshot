@@ -48,7 +48,7 @@ export const TARGETS = {
     },
     '111': {
         symblox: {
-            address: '0x0711FA8e32a4548eb8Fec327275C2b5CD6f4F331',
+            address: '0xC119b1d91b44012Db8d0ac5537f04c7FD7629c84',
             actions: [
                 {
                     signature: 'mint(address,uint256)',
@@ -80,7 +80,7 @@ export const TARGETS = {
             ]
         },
         rewardManager: {
-            address: '0x7D031D64a58812091b7147818314ebd60FF69B83',
+            address: '0x7924a8d124C04492c8653912004532C2a9CDFe59',
             actions: [
                 {
                     signature: 'add(uint256,address,bool)',
@@ -97,7 +97,7 @@ export const TARGETS = {
             ]
         },
         connectorFactory: {
-            address: '0x1CEdA23Bc906ff4D01aeBb3c9CFDBc3A8fF5eAA4',
+            address: '0x6C7D0CB3a0524BA91969Dd468313d34370c4b189',
             actions: [
                 {
                     signature: 'setConnectorImpl(uint8,address)',

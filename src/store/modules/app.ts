@@ -1,21 +1,12 @@
 import Vue from 'vue';
 import {getInstance} from '@snapshot-labs/lock/plugins/vue';
-import {getScores} from '@snapshot-labs/snapshot.js/src/utils';
-import client from '@/helpers/client';
-import ipfs from '@/helpers/ipfs';
 import {formatEther, parseEther} from '@ethersproject/units';
 import {abiEncode, abiDecode} from '@/helpers/content';
 import {vlxToEth, ethToVlx} from '@/helpers/vlxAddressConversion';
 import getProvider from '@/helpers/provider';
-import {formatProposal, formatProposals, formatSpace} from '@/helpers/utils';
-import {
-    getBlockNumber,
-    getBlockTimestamp,
-    signMessage,
-    getContract,
-    sendTransaction
-} from '@/helpers/web3';
-import {version} from '@/../package.json';
+import {formatSpace} from '@/helpers/utils';
+import {getBlockNumber, getBlockTimestamp, getContract, sendTransaction} from '@/helpers/web3';
+const {createClient} = require('graphqurl');
 
 const state = {
     init: false,
@@ -33,6 +24,40 @@ const proposalState = {
     '5': 'Queued',
     '6': 'Expired',
     '7': 'Executed'
+};
+
+const spaces = {
+    '106': {
+        domain: 'https://app.symblox.io/',
+        name: 'symblox',
+        network: '106',
+        skin: 'yearn',
+        symbol: 'SYX',
+        token: '0xD0CB9244844F3E11061fb3Ea136Aab3a6ACAC017',
+        governor: '0x8fA9dD0dA03bC91508D70d2C254dBC25560C04b5',
+        logsFromBlock: 1,
+        members: [],
+        strategies: [],
+        secondsPerBlock: 5
+    },
+    '111': {
+        domain: 'https://app.symblox.io/',
+        name: 'symblox',
+        network: '111',
+        skin: 'yearn',
+        symbol: 'SYX',
+        token: '0xC119b1d91b44012Db8d0ac5537f04c7FD7629c84',
+        governor: '0x3d235F8Dc14d41237b8F3Aa8a205F7ABBBEe0c6F',
+        logsFromBlock: 1,
+        members: [],
+        strategies: [],
+        secondsPerBlock: 10
+    }
+};
+
+const graphqlClientUrl = {
+    106: '',
+    111: 'http://123.58.215.206:8000/subgraphs/name/symblox/voting'
 };
 
 const mutations = {
@@ -128,6 +153,13 @@ const mutations = {
 };
 
 const actions = {
+    getSpaces: async ({commit}) => {
+        const newSpaces = Object.fromEntries(
+            Object.entries(spaces).map(space => [space[0], formatSpace(space[0], space[1])])
+        );
+        commit('SET', {spaces: newSpaces});
+        return newSpaces;
+    },
     setLanguage({commit}, language) {
         commit('SET_LANGUAGE', language);
     },
@@ -158,42 +190,6 @@ const actions = {
     },
     parseEther: async ({commit}, amount) => {
         return await parseEther(amount);
-    },
-    getSpaces: async ({commit}) => {
-        //let spaces: any = await client.request('spaces');
-        let spaces: any = {};
-        spaces['111'] = {
-            domain: 'https://app.symblox.io/',
-            name: 'symblox',
-            network: '111',
-            skin: 'yearn',
-            symbol: 'SYX',
-            token: '0x0711FA8e32a4548eb8Fec327275C2b5CD6f4F331',
-            governor: '0xCf008AB68979dC0a67d5b7453A3c3364E65816Ef',
-            logsFromBlock: 1,
-            members: [],
-            strategies: [],
-            secondsPerBlock: 10
-        };
-        spaces['106'] = {
-            domain: 'https://app.symblox.io/',
-            name: 'symblox',
-            network: '106',
-            skin: 'yearn',
-            symbol: 'SYX',
-            token: '0xD0CB9244844F3E11061fb3Ea136Aab3a6ACAC017',
-            governor: '0x8fA9dD0dA03bC91508D70d2C254dBC25560C04b5',
-            logsFromBlock: 1,
-            members: [],
-            strategies: [],
-            secondsPerBlock: 5
-        };
-
-        spaces = Object.fromEntries(
-            Object.entries(spaces).map(space => [space[0], formatSpace(space[0], space[1])])
-        );
-        commit('SET', {spaces});
-        return spaces;
     },
     send: async ({commit, dispatch}, {type, payload}) => {
         const auth = getInstance();
@@ -290,22 +286,36 @@ const actions = {
             commit('GET_GOVERNOR_PARAMS_FAILURE', e);
         }
     },
-    getProposals: async ({commit}, {space, blockNumber}) => {
+    getProposals: async ({commit}, space) => {
         commit('GET_PROPOSALS_REQUEST');
+        if (!space) return null;
+
         try {
             const provider = getProvider(space.network);
             const contract = await getContract(space.governor, 'Governor', provider);
-
+            const client = createClient({
+                endpoint: graphqlClientUrl[space.network]
+            });
+            const proposalLogs = await client.query({
+                query: `
+                    query ($name: String) {
+                        proposalCreateds {
+                            id
+                            proposalId
+                            proposer
+                            startBlock
+                            endBlock
+                            description
+                        }
+                    }
+                  `
+            });
             const curBlockNumber = await getBlockNumber(provider);
             const curTimestamp = await getBlockTimestamp(provider, curBlockNumber);
 
-            const proposalCreatedFilter = contract.filters.ProposalCreated();
-            proposalCreatedFilter['fromBlock'] = blockNumber ? blockNumber : space.logsFromBlock;
-            const proposalCreatedLogs = await provider.getLogs(proposalCreatedFilter);
             const proposals: any = await Promise.all(
-                proposalCreatedLogs.map(async log => {
-                    const logData = contract.interface.parseLog(log);
-                    const {description, proposer, id, startBlock, endBlock} = logData.args;
+                proposalLogs.data.proposalCreateds.map(async logData => {
+                    const {description, proposer, proposalId, id, startBlock, endBlock} = logData;
                     let startTimestamp, endTimestamp;
                     if (curBlockNumber > startBlock) {
                         startTimestamp = await getBlockTimestamp(provider, parseFloat(startBlock));
@@ -321,18 +331,18 @@ const actions = {
                             curTimestamp + (endBlock - curBlockNumber) * space.secondsPerBlock;
                     }
 
-                    const proposal = await contract.proposals(id);
-                    let stateId = await contract.state(id);
+                    const proposal = await contract.proposals(proposalId);
+                    let stateId = await contract.state(proposalId);
                     if (proposal.executed) {
                         stateId = 7;
                     }
 
                     return {
-                        id: id.toString(),
+                        id: proposalId.toString(),
                         address: proposer,
                         msg: {
                             payload: {
-                                transactionHash: log.transactionHash,
+                                transactionHash: id,
                                 name: description,
                                 start: startTimestamp,
                                 end: endTimestamp,
@@ -344,7 +354,9 @@ const actions = {
             );
 
             commit('GET_PROPOSALS_SUCCESS');
-            return proposals.reverse();
+            return proposals.sort(function(a, b) {
+                return b.id - a.id;
+            });
         } catch (e) {
             commit('GET_PROPOSALS_FAILURE', e);
         }
@@ -368,7 +380,23 @@ const actions = {
         try {
             const provider = getProvider(payload.space.network);
             const contract = await getContract(payload.space.governor, 'Governor', provider);
-
+            const client = createClient({
+                endpoint: graphqlClientUrl[payload.space.network]
+            });
+            const proposalLogs = await client.query({
+                query: `
+                    query ($name: String) {
+                        proposalCreateds(where: { proposalId: ${payload.id} }) {
+                            id
+                            proposalId
+                            proposer
+                            startBlock
+                            endBlock
+                            description
+                        }
+                    }
+                  `
+            });
             const blockNumber = await getBlockNumber(provider);
             const curTimestamp = await getBlockTimestamp(provider, blockNumber);
             const proposal = await contract.proposals(payload.id);
@@ -403,7 +431,7 @@ const actions = {
                     token: payload.space.governor,
                     type: 'proposal',
                     payload: {
-                        name: payload.name,
+                        name: proposalLogs ? proposalLogs.data.proposalCreateds[0].description : '',
                         choices: ['Yes', 'No'],
                         startBlock: proposal.startBlock,
                         endBlock: proposal.endBlock,
@@ -411,18 +439,27 @@ const actions = {
                         end: endTimestamp,
                         state: proposalState[stateId],
                         eta: proposal.eta
-                        //hasVoted: ,
                     }
                 }
             };
 
-            const voteCastFilter = contract.filters.VoteCast();
-            voteCastFilter['fromBlock'] = payload.space.logsFromBlock;
-            const voteCastLogs = await provider.getLogs(voteCastFilter);
+            const voteLogs = await client.query({
+                query: `
+                    query ($name: String) {
+                        voteCasts(where: { proposalId: ${payload.id} }) {
+                            id,
+                            voter,
+                            proposalId,
+                            support,
+                            votes
+                        }
+                    }
+                  `
+            });
+
             result.votes = await Promise.all(
-                voteCastLogs.map(async log => {
-                    const logData = contract.interface.parseLog(log);
-                    const {voter, proposalId, support, votes} = logData.args;
+                voteLogs.data.voteCasts.map(async logData => {
+                    const {voter, proposalId, support, votes} = logData;
                     if (proposalId.toString() === payload.id) {
                         return {
                             address: voter,
@@ -440,11 +477,9 @@ const actions = {
                 })
             );
             result.votes = result.votes.filter(res => res != undefined);
-
             const forVotes = proposal.forVotes / 10 ** 18,
                 againstVotes = proposal.againstVotes / 10 ** 18;
             result.results = {
-                // totalVotes: [proposal.forVotes, proposal.againstVotes],
                 totalBalances: [forVotes, againstVotes],
                 totalScores: [forVotes, againstVotes],
                 totalVotesBalances:
@@ -466,18 +501,6 @@ const actions = {
             }
             const balance = await contract.getPriorVotes(address, blockNumber);
 
-            //const blockTag = snapshot > blockNumber ? 'latest' : parseInt(snapshot);
-            // let scores: any = await getScores(
-            //   space.strategies,
-            //   space.network,
-            //   getProvider(space.network),
-            //   [address],
-            //   // @ts-ignore
-            //   blockTag
-            // );
-            // scores = scores.map((score: any) =>
-            //   Object.values(score).reduce((a, b: any) => a + b, 0)
-            // );
             const scores: any = [balance / 10 ** 18];
             commit('GET_POWER_SUCCESS');
             return {

@@ -113,7 +113,6 @@ export default {
             return Object.keys(this.proposals).length;
         },
         proposalsWithFilter() {
-            const ts = (Date.now() / 1e3).toFixed();
             if (this.totalProposals === 0) return {};
             return Object.fromEntries(
                 Object.entries(this.proposals)

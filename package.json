@@ -22,6 +22,7 @@
     "@snapshot-labs/lock": "github:snapshot-labs/lock#5b9f0592731c0105bb47f8b7bf78b4f164e27c3e",
     "@snapshot-labs/snapshot-spaces": "github:snapshot-labs/snapshot-spaces#master",
     "@snapshot-labs/snapshot.js": "github:snapshot-labs/snapshot.js#master",
+    "@urql/vue": "^0.4.0",
     "@vue/cli-plugin-babel": "^4.4.0",
     "@vue/cli-plugin-eslint": "^4.4.0",
     "@vue/cli-plugin-typescript": "^4.4.0",
@@ -36,6 +37,8 @@
     "crypto": "^1.0.1",
     "eslint": "^6.7.2",
     "fortmatic": "^2.0.6",
+    "graphql": "^15.5.1",
+    "graphqurl": "^1.0.1",
     "jsonexport": "^3.0.1",
     "lodash": "^4.17.15",
     "numeral": "^2.0.4",
@@ -47,7 +50,7 @@
     "stylus": "^0.54.8",
     "stylus-loader": "^3.0.2",
     "typescript": "~3.9.3",
-    "vue": "^2.6.11",
+    "vue": "^2.6.14",
     "vue-autofocus-directive": "^1.0.4",
     "vue-cli-plugin-webpack-bundle-analyzer": "^2.0.0",
     "vue-clipboard2": "^0.3.1",
@@ -74,6 +77,6 @@
     "node-sass": "^4.12.0",
     "prettier": "^1.19.1",
     "sass-loader": "^8.0.2",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.14"
   }
 }
