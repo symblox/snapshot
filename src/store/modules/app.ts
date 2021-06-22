@@ -400,10 +400,12 @@ const actions = {
                   `
             });
             console.log('graphql proposals end:', new Date().getTime() / 1000);
-            console.log('getBlockNumber and timestamp start:', new Date().getTime() / 1000);
+            console.log('getBlockNumber start:', new Date().getTime() / 1000);
             const blockNumber = await getBlockNumber(provider);
+            console.log('getBlockNumber end:', new Date().getTime() / 1000);
+            console.log('get timestamp start:', new Date().getTime() / 1000);
             const curTimestamp = await getBlockTimestamp(provider, blockNumber);
-            console.log('getBlockNumber and timestamp end:', new Date().getTime() / 1000);
+            console.log('get timestamp end:', new Date().getTime() / 1000);
             console.log('proposals start:', new Date().getTime() / 1000);
             const proposal = await contract.proposals(payload.id);
             console.log('proposals end:', new Date().getTime() / 1000);
