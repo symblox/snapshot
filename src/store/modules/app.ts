@@ -383,6 +383,8 @@ const actions = {
             const client = createClient({
                 endpoint: graphqlClientUrl[payload.space.network]
             });
+            console.log('network:', payload.space.network);
+            console.log('graphql proposals start:', new Date().getTime() / 1000);
             const proposalLogs = await client.query({
                 query: `
                     query ($name: String) {
@@ -397,15 +399,22 @@ const actions = {
                     }
                   `
             });
+            console.log('graphql proposals end:', new Date().getTime() / 1000);
+            console.log('getBlockNumber and timestamp start:', new Date().getTime() / 1000);
             const blockNumber = await getBlockNumber(provider);
             const curTimestamp = await getBlockTimestamp(provider, blockNumber);
+            console.log('getBlockNumber and timestamp end:', new Date().getTime() / 1000);
+            console.log('proposals start:', new Date().getTime() / 1000);
             const proposal = await contract.proposals(payload.id);
+            console.log('proposals end:', new Date().getTime() / 1000);
+            console.log('proposals state start:', new Date().getTime() / 1000);
             let stateId = await contract.state(payload.id);
+            console.log('proposals state end:', new Date().getTime() / 1000);
 
             if (proposal.executed) {
                 stateId = 7;
             }
-
+            console.log('getBlockTimestamp start:', new Date().getTime() / 1000);
             let startTimestamp, endTimestamp;
             if (blockNumber > proposal.startBlock) {
                 startTimestamp = await getBlockTimestamp(provider, parseFloat(proposal.startBlock));
@@ -422,7 +431,7 @@ const actions = {
                     curTimestamp +
                     (proposal.endBlock - blockNumber) * payload.space.secondsPerBlock;
             }
-
+            console.log('getBlockTimestamp end:', new Date().getTime() / 1000);
             const result: any = {};
             result.proposal = {
                 address: proposal.proposer,
@@ -443,6 +452,7 @@ const actions = {
                 }
             };
 
+            console.log('graphql vote start:', new Date().getTime() / 1000);
             const voteLogs = await client.query({
                 query: `
                     query ($name: String) {
@@ -456,7 +466,7 @@ const actions = {
                     }
                   `
             });
-
+            console.log('graphql vote end:', new Date().getTime() / 1000);
             result.votes = await Promise.all(
                 voteLogs.data.voteCasts.map(async logData => {
                     const {voter, proposalId, support, votes} = logData;

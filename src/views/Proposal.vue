@@ -218,10 +218,12 @@ export default {
             return space || {};
         },
         payload() {
-            return this.proposal.msg ? this.proposal.msg.payload : {};
+            return this.proposal && this.proposal.msg ? this.proposal.msg.payload : {};
         },
         title() {
-            return this.proposal ? this.proposal.msg.payload.name.split(';')[0] : '';
+            return this.proposal && this.proposal.msg
+                ? this.proposal.msg.payload.name.split(';')[0]
+                : '';
             // this.lsGet(
             //     this.app.spaces[this.web3.network.chainId].network + this.proposal.id
             // ).split(';')[0] || ''
@@ -230,6 +232,7 @@ export default {
             // const context = this.lsGet(
             //     this.app.spaces[this.web3.network.chainId].network + this.proposal.id
             // );
+            if (!this.proposal || !this.proposal.msg) return '';
             const context = this.proposal.msg.payload.name;
             if (context) {
                 const title = context.split(';')[0];
@@ -244,12 +247,8 @@ export default {
             //         this.proposal.id +
             //         'transactionHash'
             // );
-            const context = this.proposal.msg.payload.transactionHash;
-            if (context) {
-                return context;
-            } else {
-                return '';
-            }
+            if (!this.proposal || !this.proposal.msg || !this.proposal.msg.payload) return '';
+            return this.proposal.msg.payload.transactionHash;
         },
         ts() {
             return (Date.now() / 1e3).toFixed();
@@ -260,7 +259,7 @@ export default {
     },
     watch: {
         'web3.account': async function(val, prev) {
-            if (val && val.toLowerCase() !== prev) {
+            if (val && prev && val.toLowerCase() !== prev) {
                 this.loading = true;
                 this.loaded = false;
                 await this.loadPower();
@@ -270,7 +269,7 @@ export default {
             }
         },
         'web3.network.chainId': async function(val, prev) {
-            if (val.toString() !== prev.toString()) {
+            if (val && prev && val.toString() !== prev.toString()) {
                 this.loading = true;
                 this.loaded = false;
                 await this.loadPower();
@@ -401,6 +400,7 @@ export default {
         }
     },
     async created() {
+        console.log('created');
         this.loading = true;
         await this.loadProposal();
         await this.loadPower();
