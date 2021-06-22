@@ -57,7 +57,7 @@ const spaces = {
 
 const graphqlClientUrl = {
     106: '',
-    111: 'http://123.58.215.206:8000/subgraphs/name/symblox/voting'
+    111: 'https://dev.datasource.symblox.net/subgraphs/name/symblox/voting'
 };
 
 const mutations = {
