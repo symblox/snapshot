@@ -6,6 +6,9 @@ import {vlxToEth, ethToVlx} from '@/helpers/vlxAddressConversion';
 import getProvider from '@/helpers/provider';
 import {formatSpace} from '@/helpers/utils';
 import {getBlockNumber, getBlockTimestamp, getContract, sendTransaction} from '@/helpers/web3';
+import {Contract, Provider, setMulticallAddress} from 'ethers-multicall';
+import {getAddress} from '@ethersproject/address';
+import abi from '@/helpers/abi';
 const {createClient} = require('graphqurl');
 
 const state = {
@@ -48,6 +51,7 @@ const spaces = {
         symbol: 'SYX',
         token: '0xC119b1d91b44012Db8d0ac5537f04c7FD7629c84',
         governor: '0x3d235F8Dc14d41237b8F3Aa8a205F7ABBBEe0c6F',
+        multicall: '0x4fd276206056D994D8F52053679CcaAA1709597e',
         logsFromBlock: 1,
         members: [],
         strategies: [],
@@ -292,7 +296,11 @@ const actions = {
 
         try {
             const provider = getProvider(space.network);
-            const contract = await getContract(space.governor, 'Governor', provider);
+            setMulticallAddress(space.network, space.multicall);
+            const ethcallProvider = new Provider(provider);
+            await ethcallProvider.init();
+
+            const contract = new Contract(getAddress(space.governor), abi['Governor']);
             const client = createClient({
                 endpoint: graphqlClientUrl[space.network]
             });
@@ -331,8 +339,11 @@ const actions = {
                             curTimestamp + (endBlock - curBlockNumber) * space.secondsPerBlock;
                     }
 
-                    const proposal = await contract.proposals(proposalId);
-                    let stateId = await contract.state(proposalId);
+                    let [proposal, stateId] = await ethcallProvider.all([
+                        contract.proposals(proposalId),
+                        contract.state(proposalId)
+                    ]);
+
                     if (proposal.executed) {
                         stateId = 7;
                     }
@@ -379,12 +390,15 @@ const actions = {
         commit('GET_PROPOSAL_REQUEST');
         try {
             const provider = getProvider(payload.space.network);
-            const contract = await getContract(payload.space.governor, 'Governor', provider);
+            setMulticallAddress(payload.space.network, payload.space.multicall);
+            const ethcallProvider = new Provider(provider);
+            await ethcallProvider.init();
+
+            const contract = new Contract(getAddress(payload.space.governor), abi['Governor']);
             const client = createClient({
                 endpoint: graphqlClientUrl[payload.space.network]
             });
             console.log('network:', payload.space.network);
-            console.log('graphql proposals start:', new Date().getTime() / 1000);
             const proposalLogs = await client.query({
                 query: `
                     query ($name: String) {
@@ -399,24 +413,19 @@ const actions = {
                     }
                   `
             });
-            console.log('graphql proposals end:', new Date().getTime() / 1000);
-            console.log('getBlockNumber start:', new Date().getTime() / 1000);
+
             const blockNumber = await getBlockNumber(provider);
-            console.log('getBlockNumber end:', new Date().getTime() / 1000);
-            console.log('get timestamp start:', new Date().getTime() / 1000);
             const curTimestamp = await getBlockTimestamp(provider, blockNumber);
-            console.log('get timestamp end:', new Date().getTime() / 1000);
-            console.log('proposals start:', new Date().getTime() / 1000);
-            const proposal = await contract.proposals(payload.id);
-            console.log('proposals end:', new Date().getTime() / 1000);
-            console.log('proposals state start:', new Date().getTime() / 1000);
-            let stateId = await contract.state(payload.id);
-            console.log('proposals state end:', new Date().getTime() / 1000);
+
+            let [proposal, stateId] = await ethcallProvider.all([
+                contract.proposals(payload.id),
+                contract.state(payload.id)
+            ]);
 
             if (proposal.executed) {
                 stateId = 7;
             }
-            console.log('getBlockTimestamp start:', new Date().getTime() / 1000);
+
             let startTimestamp, endTimestamp;
             if (blockNumber > proposal.startBlock) {
                 startTimestamp = await getBlockTimestamp(provider, parseFloat(proposal.startBlock));
@@ -433,7 +442,6 @@ const actions = {
                     curTimestamp +
                     (proposal.endBlock - blockNumber) * payload.space.secondsPerBlock;
             }
-            console.log('getBlockTimestamp end:', new Date().getTime() / 1000);
             const result: any = {};
             result.proposal = {
                 address: proposal.proposer,
@@ -454,7 +462,6 @@ const actions = {
                 }
             };
 
-            console.log('graphql vote start:', new Date().getTime() / 1000);
             const voteLogs = await client.query({
                 query: `
                     query ($name: String) {
@@ -468,7 +475,6 @@ const actions = {
                     }
                   `
             });
-            console.log('graphql vote end:', new Date().getTime() / 1000);
             result.votes = await Promise.all(
                 voteLogs.data.voteCasts.map(async logData => {
                     const {voter, proposalId, support, votes} = logData;

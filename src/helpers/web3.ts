@@ -36,7 +36,7 @@ export async function sendTransaction(web3, [contractType, contractAddress, acti
     const contract = new Contract(getAddress(contractAddress), abi[contractType], web3);
     const contractWithSigner = contract.connect(signer);
     const overrides = {
-        gasLimit: 12e5+''
+        gasLimit: 12e5 + ''
     };
 
     try {
@@ -45,7 +45,7 @@ export async function sendTransaction(web3, [contractType, contractAddress, acti
     } catch (err) {
         console.error(err);
     }
-   
+
     const tx = await contractWithSigner[action](...params, overrides);
     await tx.wait();
     return tx;

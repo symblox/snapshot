@@ -400,7 +400,6 @@ export default {
         }
     },
     async created() {
-        console.log('created');
         this.loading = true;
         await this.loadProposal();
         await this.loadPower();
