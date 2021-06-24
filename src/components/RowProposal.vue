@@ -5,7 +5,10 @@
     >
         <div>
             <State :proposal="proposal" class="d-inline-block mr-2 mb-2" />
-            <h3 v-text="_shorten(proposal.msg.payload.name.split(';')[0], 'name')" class="d-inline-block mb-1" />
+            <h3
+                v-text="_shorten(proposal.msg.payload.name.split(';')[0], 'name')"
+                class="d-inline-block mb-1"
+            />
         </div>
         <div>
             <span v-text="`#${proposal.id}`" />
@@ -13,19 +16,19 @@
             <Badges :address="proposal.address" :space="space" class="ml-n1" />
             <Icon v-if="isVerified" name="check" title="Verified" />
             start
-            <span v-text="$d(proposal.msg.payload.start * 1e3)" />
+            <span v-text="$d(proposal.msg.payload.start * 1e3)" v-if="proposal.msg.payload.start" />
             end
-            <span v-text="$d(proposal.msg.payload.end * 1e3)" />
+            <span v-text="$d(proposal.msg.payload.end * 1e3)" v-if="proposal.msg.payload.end" />
         </div>
     </router-link>
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import {mapActions} from 'vuex';
 
 export default {
     data() {
-        return { 
+        return {
             addressVlx: ''
         };
     },
@@ -44,7 +47,11 @@ export default {
     },
     computed: {
         isVerified() {
-            return Array.isArray(this.verified) && this.verified.length > 0 && this.verified.includes(this.proposal.address);
+            return (
+                Array.isArray(this.verified) &&
+                this.verified.length > 0 &&
+                this.verified.includes(this.proposal.address)
+            );
         }
     }
 };

@@ -25,7 +25,11 @@ export async function getBlockNumber(provider) {
 export async function getBlockTimestamp(provider, blockNumber) {
     try {
         const block: any = await provider.getBlock(blockNumber);
-        return block.timestamp;
+        if (block) {
+            return block.timestamp;
+        } else {
+            return null;
+        }
     } catch (e) {
         return Promise.reject();
     }
